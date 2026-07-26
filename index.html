@@ -1,0 +1,2585 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STELLAR LAB: 별과 우주 가상 과학 실험실</title>
+  <!-- 구글 폰트: 세련된 영문 Outfit과 친숙한 한글 Noto Sans KR 적용 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ==========================================
+       1. 디자인 시스템 & 글로벌 CSS 변수 설정
+       ========================================== */
+    :root {
+      --bg-space: #05050f; /* 깊은 우주의 밤하늘 색상 */
+      --bg-card: rgba(15, 15, 35, 0.65); /* 반투명 글래스 카드 배경 */
+      --bg-input: rgba(30, 30, 60, 0.5); /* 입력 칸 배경색 */
+      --border-glow: rgba(120, 150, 255, 0.25); /* 기본 테두리 발광색 */
+      --text-main: #f0f3ff; /* 본문 텍스트 색상 */
+      --text-muted: #a5b4fc; /* 설명 텍스트 색상 */
+      --color-primary: #6366f1; /* 메인 포인트 인디고 색상 */
+      --color-secondary: #06b6d4; /* 두 번째 포인트 시안 색상 */
+      --color-accent: #f59e0b; /* 강조 골드 색상 */
+      --card-radius: 16px;
+      --transition-normal: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* 페이지 초기화 및 폰트 적용 */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-space);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      background-image: 
+        radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(6, 182, 212, 0.1) 0%, transparent 40%);
+    }
+
+    /* 우주의 별 반짝임 동적 배경 효과 */
+    #stars-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* 스크롤바 커스텀 */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(10, 10, 25, 0.5);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--color-primary);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--color-secondary);
+    }
+
+    /* ==========================================
+       2. 전체 레이아웃 (Layout)
+       ========================================== */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      padding: 30px 0 20px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .header-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 2.8rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #fff 30%, var(--text-muted) 70%, var(--color-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+      text-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      margin-top: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    /* 수업 정보 안내 배너 (글래스모피즘 적용) */
+    .class-guide {
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--border-glow);
+      border-radius: var(--card-radius);
+      padding: 20px;
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .class-guide-badge {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #fff;
+      text-align: center;
+      min-width: 140px;
+    }
+
+    .class-guide-text {
+      flex: 1;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--text-main);
+    }
+
+    .class-guide-text strong {
+      color: var(--color-secondary);
+    }
+
+    /* ==========================================
+       3. 탭 네비게이션 (Tab Navigation)
+       ========================================== */
+    .tabs-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .tabs {
+      display: flex;
+      background: rgba(10, 10, 30, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 6px;
+      border-radius: 30px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 12px 30px;
+      font-size: 1.05rem;
+      font-weight: 500;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: var(--transition-normal);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .tab-btn.active {
+      color: #fff;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+      box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+    }
+
+    /* 탭 콘텐츠 영역 */
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.5s ease-in-out forwards;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ==========================================
+       4. 탭 1: 개념 실험실 (Concept Lab) 스타일
+       ========================================== */
+    .lab-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+
+    /* 실험 도구 카드 공통 */
+    .lab-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glow);
+      border-radius: var(--card-radius);
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      height: 680px; /* 전체 높이 정렬 */
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+      position: relative;
+      transition: var(--transition-normal);
+    }
+
+    .lab-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(6, 182, 212, 0.5);
+      box-shadow: 0 20px 45px rgba(6, 182, 212, 0.15);
+    }
+
+    .lab-card h2 {
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 12px;
+    }
+
+    .lab-card h2 span {
+      font-size: 1.8rem;
+    }
+
+    .lab-card .lab-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+
+    /* 시뮬레이터 캔버스/출력부 공통 */
+    .sim-viewport {
+      flex: 1;
+      background: rgba(5, 5, 15, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 컨트롤 판넬 */
+    .sim-controls {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 15px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .control-group {
+      margin-bottom: 12px;
+    }
+
+    .control-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .control-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .control-label span.val {
+      color: var(--color-secondary);
+      font-weight: 700;
+    }
+
+    /* 슬라이더 인풋 스타일 */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      height: 6px;
+      border-radius: 3px;
+      outline: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--color-secondary);
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--color-secondary);
+      transition: background 0.15s;
+    }
+
+    input[type=range]::-webkit-slider-thumb:hover {
+      background: var(--color-primary);
+      box-shadow: 0 0 12px var(--color-primary);
+    }
+
+    /* 버튼 스타일 */
+    .btn {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: var(--transition-normal);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn:hover {
+      opacity: 0.95;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow: none;
+      transform: translateY(-1px);
+    }
+
+    /* 시뮬레이터 세부: 1) 연주시차 */
+    #parallax-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .parallax-sky-overlay {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      height: 65px;
+      background: rgba(5, 5, 20, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      overflow: hidden;
+      padding: 5px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sky-title {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 2px;
+      text-align: center;
+    }
+
+    .sky-display {
+      flex: 1;
+      position: relative;
+      border-top: 1px dashed rgba(255, 255, 255, 0.15);
+    }
+
+    .parallax-sky-star {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ffcc00;
+      box-shadow: 0 0 10px #ffcc00;
+      z-index: 10;
+      transition: left 0.05s linear;
+    }
+
+    /* 시뮬레이터 세부: 2) 등급 */
+    .magnitude-sim-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 15px;
+      justify-content: space-between;
+    }
+
+    .magnitude-view {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex: 1;
+    }
+
+    .mag-star-box {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 45%;
+    }
+
+    .mag-star-circle-wrap {
+      width: 120px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 50%;
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+      margin-bottom: 10px;
+    }
+
+    .mag-star-circle {
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 20px #fff;
+      transition: width 0.3s ease, height 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    }
+
+    .mag-star-box p {
+      font-size: 0.85rem;
+      margin-top: 5px;
+    }
+
+    .mag-compare-badge {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 8px 12px;
+      text-align: center;
+      font-size: 0.85rem;
+    }
+
+    .mag-compare-formula {
+      font-family: monospace;
+      color: var(--color-accent);
+      font-size: 1rem;
+      font-weight: bold;
+      margin-top: 4px;
+    }
+
+    /* 시뮬레이터 세부: 3) 온도와 색깔 */
+    .temperature-sim-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+    }
+
+    .temp-star-glow {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: #fff;
+      position: relative;
+      margin-bottom: 25px;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+
+    .temp-star-glow::after {
+      content: '';
+      position: absolute;
+      top: -15px; left: -15px; right: -15px; bottom: -15px;
+      border-radius: 50%;
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+      100% { transform: rotate(360deg); }
+    }
+
+    .temp-spectrum-bar {
+      width: 100%;
+      height: 25px;
+      border-radius: 6px;
+      background: linear-gradient(to right, #ff3300 0%, #ff9900 20%, #ffff00 40%, #ffffee 60%, #99ccff 80%, #3366ff 100%);
+      position: relative;
+      margin-bottom: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .temp-spectrum-pointer {
+      position: absolute;
+      top: -3px;
+      width: 4px;
+      height: 31px;
+      background: #fff;
+      border: 1px solid #000;
+      transform: translateX(-50%);
+      box-shadow: 0 0 6px #fff;
+      transition: left 0.1s ease;
+    }
+
+    .temp-spectral-class-badge {
+      display: inline-block;
+      background: var(--color-primary);
+      color: white;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    .temp-star-example {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+
+    /* ==========================================
+       5. 탭 2: 별 탐색기 (Star Explorer) 스타일
+       ========================================== */
+    .explorer-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    @media (max-width: 900px) {
+      .explorer-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* 별 목록 사이드바 */
+    .star-list-panel {
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--border-glow);
+      border-radius: var(--card-radius);
+      padding: 20px;
+      max-height: 700px;
+      overflow-y: auto;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.3);
+    }
+
+    .star-list-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .star-list-title span.count {
+      background: var(--color-primary);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+    }
+
+    .star-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .star-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 12px 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: var(--transition-normal);
+    }
+
+    .star-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(6, 182, 212, 0.4);
+      transform: translateX(4px);
+    }
+
+    .star-item.active {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(6, 182, 212, 0.25));
+      border-color: var(--color-secondary);
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+    }
+
+    .star-item-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .star-item-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      box-shadow: 0 0 8px currentColor;
+    }
+
+    .star-item-name {
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .star-item-const {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: block;
+      margin-top: 2px;
+    }
+
+    .star-item-mag {
+      font-size: 0.8rem;
+      color: var(--color-accent);
+      font-weight: 600;
+    }
+
+    /* 별 상세 카드 */
+    .star-detail-panel {
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--border-glow);
+      border-radius: var(--card-radius);
+      padding: 30px;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 500px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 디테일 패널 배경 은은한 별 그래픽 효과 */
+    .star-detail-glow-bg {
+      position: absolute;
+      top: -150px;
+      right: -150px;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--star-color-theme, #fff) 0%, transparent 70%);
+      opacity: 0.15;
+      pointer-events: none;
+      filter: blur(40px);
+      z-index: 0;
+      transition: background 0.5s ease;
+    }
+
+    .star-detail-header {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 20px;
+      margin-bottom: 20px;
+    }
+
+    .star-detail-title h3 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .star-detail-title span.subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-top: 4px;
+      display: block;
+    }
+
+    .star-detail-avatar-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .star-detail-avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      box-shadow: 0 0 25px var(--star-color-theme, #fff);
+      background-color: var(--star-color-theme, #fff);
+      transition: all 0.5s ease;
+    }
+
+    .star-detail-body {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+    }
+
+    /* 물리량 격자 */
+    .star-specs-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    @media (max-width: 500px) {
+      .star-specs-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .spec-item {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 12px 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .spec-item-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .spec-item-val {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .spec-item-val.highlight-val {
+      color: var(--color-secondary);
+    }
+
+    .star-description {
+      background: rgba(255, 255, 255, 0.02);
+      border-left: 3px solid var(--color-primary);
+      padding: 15px;
+      border-radius: 0 10px 10px 0;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--text-main);
+    }
+
+    .star-detail-footer {
+      position: relative;
+      z-index: 1;
+      margin-top: 25px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* ==========================================
+       6. 탭 3: 포스터 제작소 (Poster Creator) 스타일
+       ========================================== */
+    .creator-layout {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 35px;
+      margin-bottom: 40px;
+    }
+
+    @media (max-width: 1000px) {
+      .creator-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* 포스터 편집 폼 */
+    .creator-form-panel {
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--border-glow);
+      border-radius: var(--card-radius);
+      padding: 25px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.3);
+    }
+
+    .creator-form-panel h3 {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-section {
+      margin-bottom: 20px;
+      background: rgba(0, 0, 0, 0.15);
+      padding: 15px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .form-section-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--color-secondary);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* 포스터 테마 칼라 선택칩 */
+    .theme-picker {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    .theme-chip {
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: var(--transition-normal);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .theme-chip:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .theme-chip.active {
+      background: var(--color-primary);
+      border-color: #fff;
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+    }
+
+    .theme-color-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    /* 텍스트 인풋, 텍스트에어리어, 셀렉트 스타일 */
+    input[type=text], select, textarea {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+      transition: var(--transition-normal);
+    }
+
+    input[type=text]:focus, select:focus, textarea:focus {
+      border-color: var(--color-secondary);
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.25);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+
+    /* 포스터 렌더링 뷰 */
+    .creator-preview-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    /* 캔버스 포스터 렌더러 */
+    .poster-canvas-container {
+      width: 100%;
+      max-width: 450px;
+      aspect-ratio: 1 / 1.414; /* A4 비율 */
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+
+    #poster-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .preview-actions {
+      display: flex;
+      gap: 15px;
+      width: 100%;
+      max-width: 450px;
+    }
+
+    .preview-actions .btn {
+      flex: 1;
+      padding: 12px;
+    }
+
+    /* ==========================================
+       7. 푸터 (Footer) 스타일
+       ========================================== */
+    footer {
+      text-align: center;
+      padding: 40px 0 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      margin-top: 50px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    footer a {
+      color: var(--color-secondary);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* ==========================================
+       8. 기타 유틸리티 & 특수 요소
+       ========================================== */
+    .flex-center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .star-select-helper {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(99, 102, 241, 0.1));
+      border: 1px dashed var(--color-secondary);
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .tooltip {
+      position: relative;
+      cursor: help;
+      border-bottom: 1px dotted var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 뒷배경: 동적 스타필드 렌더링용 캔버스 -->
+  <canvas id="stars-background"></canvas>
+
+  <div class="container">
+    <!-- 헤더 영역 -->
+    <header>
+      <div class="header-logo">⭐ STELLAR LAB</div>
+      <p>별과 우주 가상 과학 실험실 (중학교 3학년 탐구기반 개념 학습)</p>
+    </header>
+
+    <!-- 수업 안내 가이드 배너 -->
+    <section class="class-guide">
+      <div class="class-guide-badge">
+        📅 1차시 과제<br>별 포스터 만들기
+      </div>
+      <div class="class-guide-text">
+        우주 과학 탐험가 여러분! 오늘은 밤하늘의 대표적인 별들을 탐구하고 나만의 <strong>별 탐구 포스터</strong>를 제작해 보겠습니다.<br>
+        포스터를 만들기 전에 <strong>[1단계: 개념 실험실]</strong>에서 연주시차, 등급, 온도의 원리를 직접 시뮬레이션해 보고, 
+        <strong>[2단계: 별 탐색기]</strong>에서 포스터에 담을 별 정보를 수집한 뒤 <strong>[3단계: 포스터 제작소]</strong>에서 멋지게 완성하여 제출하세요!
+      </div>
+    </section>
+
+    <!-- 탭 네비게이션 버튼 그룹 -->
+    <div class="tabs-wrapper">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('concept-lab')">🔬 1. 개념 실험실</button>
+        <button class="tab-btn" onclick="switchTab('star-explorer')">🌌 2. 별 탐색기</button>
+        <button class="tab-btn" onclick="switchTab('poster-creator')">🎨 3. 포스터 제작소</button>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         탭 1: 개념 실험실 (Concept Lab)
+         ======================================================== -->
+    <main id="concept-lab" class="tab-content active">
+      <div class="lab-grid">
+        
+        <!-- 1) 연주시차 시뮬레이터 카드 -->
+        <div class="lab-card">
+          <h2><span>🔭</span> 연주시차 시뮬레이터</h2>
+          <p class="lab-desc">
+            지구가 태양 주위를 공전(1년에 1바퀴)할 때, 6개월 간격으로 별을 관측하면 배경 별들을 기준으로 별의 위치가 달라져 보입니다. 이 변화를 <strong>연주시차</strong>(시차의 절반)라고 합니다. 슬라이더로 거리를 조절하며 관측해 보세요!
+          </p>
+          <!-- 캔버스 드로잉 영역 -->
+          <div class="sim-viewport">
+            <canvas id="parallax-canvas"></canvas>
+            <!-- 윗부분 하늘 뷰 (실제 천구에서 배경별 대비 가까운별이 어떻게 흔들려 보이는지 렌더링) -->
+            <div class="parallax-sky-overlay">
+              <div class="sky-title">지구에서 본 밤하늘 (별의 겉보기 위치 변화)</div>
+              <div class="sky-display" id="sky-display">
+                <!-- 배경 고정 점들 -->
+                <div style="position:absolute; left:15%; top:40%; width:3px; height:3px; background:#fff; opacity:0.5;"></div>
+                <div style="position:absolute; left:30%; top:25%; width:2px; height:2px; background:#fff; opacity:0.4;"></div>
+                <div style="position:absolute; left:48%; top:30%; width:2px; height:2.5px; background:#fff; opacity:0.2; border-left: 1px dashed rgba(255,255,255,0.4); height:30px;"></div>
+                <div style="position:absolute; left:70%; top:45%; width:2px; height:2px; background:#fff; opacity:0.5;"></div>
+                <div style="position:absolute; left:85%; top:20%; width:3px; height:3px; background:#fff; opacity:0.3;"></div>
+                <!-- 이동하는 대상 별 -->
+                <div class="parallax-sky-star" id="parallax-sky-star"></div>
+              </div>
+            </div>
+          </div>
+          <!-- 조작 판넬 -->
+          <div class="sim-controls">
+            <div class="control-group">
+              <div class="control-label">
+                <span>태양-별 사이의 거리</span>
+                <span class="val" id="parallax-dist-val">5.0 광년</span>
+              </div>
+              <input type="range" id="parallax-dist-slider" min="2" max="15" step="0.5" value="5">
+            </div>
+            <div class="control-group">
+              <div class="control-label">
+                <span>계산된 연주시차 (초, ")</span>
+                <span class="val" id="parallax-angle-val" style="color:var(--color-accent)">0.65"</span>
+              </div>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-muted); line-height:1.4; margin-top:5px; text-align:center;">
+              💡 <strong>핵심 발견:</strong> 별의 거리가 <span style="color:#ff7675;font-weight:bold;">가까울수록</span> 연주시차는 <span style="color:#ff7675;font-weight:bold;">커지고</span>, 거리가 <span style="color:#74b9ff;font-weight:bold;">멀어질수록</span> 연주시차는 <span style="color:#74b9ff;font-weight:bold;">작아집니다</span>!
+            </p>
+          </div>
+        </div>
+
+        <!-- 2) 등급 시뮬레이터 카드 -->
+        <div class="lab-card">
+          <h2><span>💡</span> 별의 등급 시뮬레이터</h2>
+          <p class="lab-desc">
+            <strong>겉보기 등급(m)</strong>은 우리 눈에 보이는 밝기이고, <strong>절대 등급(M)</strong>은 모든 별을 10pc(파섹, 약 32.6광년) 거리에 일렬로 놓았다고 가정한 실제 밝기입니다. 별의 거리를 조절하며 밝기 차이를 비교해 봅시다.
+          </p>
+          <!-- 관측 뷰포트 -->
+          <div class="sim-viewport" style="background:#02020a;">
+            <div class="magnitude-sim-container">
+              <div class="magnitude-view">
+                <!-- 겉보기 등급 영역 -->
+                <div class="mag-star-box">
+                  <div class="mag-star-circle-wrap">
+                    <div class="mag-star-circle" id="apparent-star-sphere" style="width:40px; height:40px; background:#fffbf0; box-shadow: 0 0 25px #fffbf0;"></div>
+                  </div>
+                  <span style="font-size:0.75rem; color:var(--text-muted);">지구에서 본 모습</span>
+                  <strong style="font-size:0.95rem; margin-top:2px;">겉보기 등급 (m)</strong>
+                  <span class="val" id="apparent-mag-val" style="color:var(--color-secondary); font-size:1.1rem; font-weight:700;">1.5 등급</span>
+                </div>
+                <!-- 절대 등급 영역 -->
+                <div class="mag-star-box">
+                  <div class="mag-star-circle-wrap" style="border-color: rgba(99, 102, 241, 0.4);">
+                    <div class="mag-star-circle" id="absolute-star-sphere" style="width:30px; height:30px; background:#fffbf0; box-shadow: 0 0 15px #fffbf0;"></div>
+                  </div>
+                  <span style="font-size:0.75rem; color:var(--text-muted);">10pc 거리 기준</span>
+                  <strong style="font-size:0.95rem; margin-top:2px;">절대 등급 (M)</strong>
+                  <span class="val" id="absolute-mag-val" style="color:var(--color-primary); font-size:1.1rem; font-weight:700;">2.0 등급</span>
+                </div>
+              </div>
+              <!-- 거리 및 수식 비교 뱃지 -->
+              <div class="mag-compare-badge">
+                <span id="mag-relation-text">별의 거리 &lt; 10pc (겉보기가 더 밝음)</span>
+                <div class="mag-compare-formula" id="mag-formula-text">m &lt; M</div>
+              </div>
+            </div>
+          </div>
+          <!-- 조작 판넬 -->
+          <div class="sim-controls">
+            <div class="control-group">
+              <div class="control-label">
+                <span>별의 관측 거리 (pc)</span>
+                <span class="val" id="mag-distance-val">5.0 pc (약 16.3 광년)</span>
+              </div>
+              <input type="range" id="mag-distance-slider" min="1" max="50" step="0.5" value="5">
+            </div>
+            <div class="control-group" style="display:flex; gap:10px;">
+              <button class="btn btn-secondary" style="flex:1; padding:8px 0;" onclick="setMagDistance(10)">📍 10pc에 일렬 배치</button>
+              <button class="btn btn-secondary" style="flex:1; padding:8px 0;" onclick="setMagDistance(2)">🏃 지구 근처로 (2pc)</button>
+              <button class="btn btn-secondary" style="flex:1; padding:8px 0;" onclick="setMagDistance(40)">🛸 멀리 우주로 (40pc)</button>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-muted); line-height:1.4; margin-top:5px; text-align:center;">
+              💡 10pc보다 가까이 오면 <strong>겉보기등급(m) &lt; 절대등급(M)</strong>이 되고, 10pc에 있으면 <strong>m = M</strong>, 10pc보다 멀어지면 <strong>m &gt; M</strong>(더 어둡게 보임)이 됩니다.
+            </p>
+          </div>
+        </div>
+
+        <!-- 3) 표면 온도와 색깔 시뮬레이터 카드 -->
+        <div class="lab-card">
+          <h2><span>🔥</span> 표면 온도와 별의 색깔</h2>
+          <p class="lab-desc">
+            별의 색깔은 별의 <strong>표면 온도</strong>에 의해 결정됩니다. 온도가 낮은 별은 붉은색을 띠고, 온도가 올라갈수록 주황색, 노란색, 흰색을 거쳐 가장 뜨거운 별은 푸른색을 띱니다. 온도 슬라이더를 밀어 색깔 변화를 확인하세요.
+          </p>
+          <!-- 스펙트럼 뷰포트 -->
+          <div class="sim-viewport">
+            <div class="temperature-sim-container">
+              <!-- 별의 온도 발광 시각화 -->
+              <div class="temp-star-glow" id="temp-star-sphere"></div>
+              
+              <!-- 연속 스펙트럼 인디케이터 바 -->
+              <div class="temp-spectrum-bar">
+                <div class="temp-spectrum-pointer" id="temp-pointer" style="left: 40%;"></div>
+              </div>
+              <div style="width:100%; display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-muted); margin-bottom:10px;">
+                <span>붉은색 (저온)</span>
+                <span>노란색 (중온)</span>
+                <span>파란색 (고온)</span>
+              </div>
+            </div>
+          </div>
+          <!-- 조작 판넬 -->
+          <div class="sim-controls">
+            <div class="control-group">
+              <div class="control-label">
+                <span>별의 표면 온도 (K)</span>
+                <span class="val" id="temp-val">5,800 K (태양 수준)</span>
+              </div>
+              <input type="range" id="temp-slider" min="3000" max="30000" step="500" value="5800">
+            </div>
+            <div class="control-group" style="text-align: center;">
+              <span class="temp-spectral-class-badge" id="temp-class-badge">분광형 G형</span>
+              <div class="temp-star-example" id="temp-example-text">대표적인 별: 태양 (노란색)</div>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-muted); line-height:1.4; margin-top:5px; text-align:center;">
+              💡 <strong>별의 색깔과 온도 관계:</strong> 우주에서 가장 뜨거운 별은 빨간색이 아니라 <span style="color:#74b9ff;font-weight:bold;">파란색</span>이고, 상대적으로 가장 차가운 별이 <span style="color:#ff7675;font-weight:bold;">붉은색</span>입니다.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- ========================================================
+         탭 2: 별 탐색기 (Star Explorer)
+         ======================================================== -->
+    <div id="star-explorer" class="tab-content">
+      <div class="explorer-layout">
+        
+        <!-- 왼쪽: 유명한 대표 별 11종 목록 사이드바 -->
+        <section class="star-list-panel">
+          <div class="star-list-title">
+            <span>추천 대표 별 목록</span>
+            <span class="count">11개 탐색 가능</span>
+          </div>
+          <div class="star-list" id="star-list-container">
+            <!-- 자바스크립트로 동적 렌더링 -->
+          </div>
+        </section>
+
+        <!-- 오른쪽: 선택된 별 상세 정보 뷰 -->
+        <section class="star-detail-panel" id="star-detail-card">
+          <!-- 별의 대표 색상 테마 백그라운드 발광 효과 -->
+          <div class="star-detail-glow-bg" id="detail-glow-bg"></div>
+
+          <div class="star-detail-header">
+            <div class="star-detail-title">
+              <h3 id="detail-name">시리우스 (Sirius)</h3>
+              <span class="subtitle" id="detail-const">큰개자리 알파 (Alpha Canis Majoris)</span>
+            </div>
+            <div class="star-detail-avatar-wrap">
+              <div class="star-detail-avatar" id="detail-avatar"></div>
+            </div>
+          </div>
+
+          <div class="star-detail-body">
+            <div class="star-specs-grid">
+              <div class="spec-item">
+                <span class="spec-item-label">겉보기 등급 (m)</span>
+                <span class="spec-item-val highlight-val" id="detail-apparent">-1.46 등급</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-item-label">절대 등급 (M)</span>
+                <span class="spec-item-val" id="detail-absolute">1.4 등급</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-item-label">연주시차 (p)</span>
+                <span class="spec-item-val highlight-val" id="detail-parallax">0.379"</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-item-label">거리 (광년)</span>
+                <span class="spec-item-val" id="detail-distance">8.6 광년</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-item-label">표면 온도 (K)</span>
+                <span class="spec-item-val" id="detail-temp" style="color: #64b5f6;">9,940 K</span>
+              </div>
+              <div class="spec-item">
+                <span class="spec-item-label">별의 색깔 (분광형)</span>
+                <span class="spec-item-val" id="detail-color">청백색 (A1V)</span>
+              </div>
+            </div>
+
+            <!-- 별의 과학적 설명 정보 박스 -->
+            <div class="star-description" id="detail-desc">
+              별에 대한 상세 탐구 내용이 로드됩니다.
+            </div>
+          </div>
+
+          <div class="star-detail-footer">
+            <button class="btn btn-secondary" onclick="loadToPoster()">📋 포스터 편집기로 이 별 정보 보내기</button>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- ========================================================
+         탭 3: 포스터 제작소 (Poster Creator)
+         ======================================================== -->
+    <div id="poster-creator" class="tab-content">
+      <div class="creator-layout">
+        
+        <!-- 왼쪽: 포스터 정보 입력 서식 폼 -->
+        <section class="creator-form-panel">
+          <h3>🎨 포스터 디자인 및 정보 입력</h3>
+          
+          <!-- 별 불러오기 도우미 -->
+          <div class="star-select-helper">
+            <span>2단계에서 탐색한 별의 데이터 불러오기:</span>
+            <select id="form-star-select" style="width: 200px; padding: 6px 10px;" onchange="applySelectedStarToForm()">
+              <option value="">-- 별 선택하기 --</option>
+              <!-- 자바스크립트로 옵션들 자동 삽입 -->
+            </select>
+          </div>
+
+          <form id="poster-form" oninput="drawPoster()">
+            
+            <!-- 섹션 1: 인적사항 및 기본 정보 -->
+            <div class="form-section">
+              <div class="form-section-title">👤 작성자 및 기본 설정</div>
+              <div class="input-row">
+                <div class="form-group">
+                  <label for="post-author">제출 학생 이름</label>
+                  <input type="text" id="post-author" value="홍길동" placeholder="예: 3학년 1반 김우주">
+                </div>
+                <div class="form-group">
+                  <label for="post-title">포스터 제목</label>
+                  <input type="text" id="post-title" value="신비한 항성 탐구 보고서" placeholder="예: 시리우스 탐구 포스터">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>포스터 테마 색상 선택</label>
+                <div class="theme-picker">
+                  <button type="button" class="theme-chip active" onclick="setPosterTheme('purple', this)">
+                    <span class="theme-color-dot" style="background:#5c3df5;"></span> 네뷸라 퍼플
+                  </button>
+                  <button type="button" class="theme-chip" onclick="setPosterTheme('cyan', this)">
+                    <span class="theme-color-dot" style="background:#00bcd4;"></span> 사이언 스페이스
+                  </button>
+                  <button type="button" class="theme-chip" onclick="setPosterTheme('gold', this)">
+                    <span class="theme-color-dot" style="background:#ffb300;"></span> 골드 코스모스
+                  </button>
+                  <button type="button" class="theme-chip" onclick="setPosterTheme('red', this)">
+                    <span class="theme-color-dot" style="background:#ff3333;"></span> 적색거성 레드
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 섹션 2: 대상 별 물리적 제원 -->
+            <div class="form-section">
+              <div class="form-section-title">✨ 탐구 대상 별의 물리 정보</div>
+              <div class="input-row">
+                <div class="form-group">
+                  <label for="post-star-name">별 이름 (국문/영문)</label>
+                  <input type="text" id="post-star-name" value="시리우스 (Sirius)">
+                </div>
+                <div class="form-group">
+                  <label for="post-star-const">소속 별자리</label>
+                  <input type="text" id="post-star-const" value="큰개자리 알파">
+                </div>
+              </div>
+
+              <div class="input-row" style="margin-top:10px;">
+                <div class="form-group">
+                  <label for="post-star-apparent">겉보기 등급 (m)</label>
+                  <input type="text" id="post-star-apparent" value="-1.46 등급">
+                </div>
+                <div class="form-group">
+                  <label for="post-star-absolute">절대 등급 (M)</label>
+                  <input type="text" id="post-star-absolute" value="1.4 등급">
+                </div>
+              </div>
+
+              <div class="input-row" style="margin-top:10px;">
+                <div class="form-group">
+                  <label for="post-star-parallax">연주시차 (")</label>
+                  <input type="text" id="post-star-parallax" value="0.379\"">
+                </div>
+                <div class="form-group">
+                  <label for="post-star-distance">실제 거리 (광년)</label>
+                  <input type="text" id="post-star-distance" value="8.6 광년">
+                </div>
+              </div>
+
+              <div class="input-row" style="margin-top:10px;">
+                <div class="form-group">
+                  <label for="post-star-temp">표면 온도 (K)</label>
+                  <input type="text" id="post-star-temp" value="9,940 K">
+                </div>
+                <div class="form-group">
+                  <label for="post-star-color">별의 색깔</label>
+                  <input type="text" id="post-star-color" value="청백색">
+                </div>
+              </div>
+            </div>
+
+            <!-- 섹션 3: 서술형 과학적 탐구 질문 -->
+            <div class="form-section">
+              <div class="form-section-title">📝 별과 우주 개념 탐구 서술형 질문</div>
+              
+              <div class="form-group">
+                <label for="post-q1">Q1. 이 별의 연주시차와 지구로부터의 거리는 어떤 관계가 있나요?</label>
+                <textarea id="post-q1">연주시차와 별의 거리는 반비례 관계입니다. 시리우스의 연주시차는 0.379"로 비교적 큰 편이기 때문에, 지구에서 8.6광년으로 가까운 거리에 있는 별임을 알 수 있습니다.</textarea>
+              </div>
+
+              <div class="form-group" style="margin-top:10px;">
+                <label for="post-q2">Q2. 겉보기 등급과 절대 등급을 비교할 때, 이 별은 10pc(32.6광년)보다 가까울까요 멀까요? 그 이유는?</label>
+                <textarea id="post-q2">시리우스는 겉보기등급(-1.46)이 절대등급(1.4)보다 작습니다(m < M). 겉보기등급이 작을수록 밝게 보인다는 의미이므로, 10pc에 두었을 때(절대등급)보다 우리 눈에 볼 때(겉보기등급) 훨씬 밝으므로 이 별은 10pc보다 훨씬 가까운 위치에 존재합니다.</textarea>
+              </div>
+
+              <div class="form-group" style="margin-top:10px;">
+                <label for="post-q3">Q3. 표면 온도와 별의 색깔을 통해 알아본 이 별의 물리적 특징은 무엇인가요?</label>
+                <textarea id="post-q3">시리우스의 표면 온도는 약 9,940K로 매우 높으며 청백색(흰색) 빛을 방출합니다. 이는 태양(5,800K, 노란색)보다 훨씬 뜨겁고 활동적인 주계열성 단계의 별임을 뜻합니다.</textarea>
+              </div>
+
+              <div class="form-group" style="margin-top:10px;">
+                <label for="post-q4">💡 탐구를 마치며 느낀 점 한 줄 쓰기</label>
+                <textarea id="post-q4">눈으로 볼 때 가장 밝은 시리우스가 실제 밝기(절대등급)로는 리겔이나 베텔게우스보다 훨씬 어둡다는 사실이 정말 신기했고, 연주시차와 등급의 개념을 통해 별의 진짜 매력을 배울 수 있었습니다.</textarea>
+              </div>
+            </div>
+
+          </form>
+        </section>
+
+        <!-- 오른쪽: 실시간 렌더링 캔버스 및 다운로드 버튼 -->
+        <section class="creator-preview-panel">
+          <h3 style="align-self: flex-start;">👁️ 실시간 포스터 인쇄 미리보기</h3>
+          
+          <div class="poster-canvas-container">
+            <canvas id="poster-canvas" width="800" height="1130"></canvas>
+          </div>
+
+          <div class="preview-actions">
+            <button class="btn" onclick="downloadPosterImage()">💾 포스터 이미지 저장 (PNG)</button>
+            <button class="btn btn-secondary" onclick="window.print()">🖨️ 포스터 인쇄 (PDF 저장)</button>
+          </div>
+          <p style="font-size:0.8rem; color:var(--text-muted); text-align:center; line-height:1.4;">
+            ※ 저장한 포스터 이미지 파일(.png)을 과제 제출 게시판(패들렛, 구글 클래스룸 등)에 등록하여 선생님께 과제를 제출하세요!
+          </p>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- 푸터 영역 -->
+    <footer>
+      <p>© 2026 STELLAR LAB. 중학교 3학년 과학 탐구 학습 도구 (별과 우주 단원 1차시)</p>
+      <p style="margin-top:8px; font-size:0.75rem;">Created for Future Science Teachers & Students</p>
+    </footer>
+  </div>
+
+  <!-- ========================================================
+       JavaScript 로직 구현부
+       ======================================================== -->
+  <script>
+    /* ==========================================
+       A. 11종 대표 별 데이터베이스 (Database)
+       ========================================== */
+    const starsDatabase = [
+      {
+        id: "sun",
+        name: "태양 (Sun)",
+        constellation: "태양계 (가장 가까운 항성)",
+        apparentMag: -26.7,
+        absoluteMag: 4.8,
+        parallax: 206265, // 각도로 환산한 아주 가까운 거리
+        parallaxStr: "측정 불가 (너무 가까움)",
+        distanceLy: "0.0000158 (약 8광분)",
+        temperature: 5800,
+        color: "노란색 (분광형 G2)",
+        colorHex: "#FFD700",
+        desc: "우리 태양계의 중심별로, 지구에서 볼 때는 밤하늘 모든 별을 통틀어 가장 밝은 별(-26.7등급)이지만 우주 전체 관점에서 보면 절대등급 4.8등급의 아주 평범하고 아담한 황색 주계열성입니다."
+      },
+      {
+        id: "sirius",
+        name: "시리우스 (Sirius)",
+        constellation: "큰개자리 알파",
+        apparentMag: -1.46,
+        absoluteMag: 1.4,
+        parallax: 0.379,
+        parallaxStr: "0.379\"",
+        distanceLy: "8.6",
+        temperature: 9940,
+        color: "청백색 (분광형 A1)",
+        colorHex: "#E6F2FF",
+        desc: "태양을 제외하고 지구 밤하늘에서 눈으로 보기에 가장 밝은 별입니다. 절대등급도 1.4등급으로 높은 편이며, 지구와 8.6광년으로 매우 가깝기 때문에 겉보기 등급이 매우 낮게(밝게) 관측됩니다."
+      },
+      {
+        id: "betelgeuse",
+        name: "베텔게우스 (Betelgeuse)",
+        constellation: "오리온자리 알파",
+        apparentMag: 0.5,
+        absoluteMag: -5.1,
+        parallax: 0.005,
+        parallaxStr: "0.005\"",
+        distanceLy: "640",
+        temperature: 3500,
+        color: "붉은색 (분광형 M1)",
+        colorHex: "#FF5533",
+        desc: "오리온자리의 어깨에 위치한 적색 초거성입니다. 수명이 다해 팽창했기 때문에 온도는 낮지만 크기가 태양의 900배가 넘어 절대등급이 무려 -5.1등급에 달하는 우주급 초거성입니다."
+      },
+      {
+        id: "rigel",
+        name: "리겔 (Rigel)",
+        constellation: "오리온자리 베타",
+        apparentMag: 0.13,
+        absoluteMag: -7.8,
+        parallax: 0.0037,
+        parallaxStr: "0.0037\"",
+        distanceLy: "860",
+        temperature: 12100,
+        color: "청백색 (분광형 B8)",
+        colorHex: "#AEEEEE",
+        desc: "오리온자리의 발 쪽에서 빛나는 청색 초거성입니다. 절대등급이 무려 -7.8등급으로, 스스로 뿜어내는 에너지는 태양의 수만 배에 이릅니다. 860광년이라는 아주 먼 거리에서도 1등성으로 밝게 보입니다."
+      },
+      {
+        id: "vega",
+        name: "베가 (Vega/직녀성)",
+        constellation: "거문고자리 알파",
+        apparentMag: 0.03,
+        absoluteMag: 0.6,
+        parallax: 0.129,
+        parallaxStr: "0.129\"",
+        distanceLy: "25",
+        temperature: 9600,
+        color: "청백색 (분광형 A0)",
+        colorHex: "#F0F8FF",
+        desc: "여름철 밤하늘을 대표하는 직녀성입니다. 오랫동안 별의 밝기(등급) 시스템에서 0등급의 기준점으로 사용되었습니다. 지구에서 25광년 떨어져 있으며, 자전이 빨라 타원형으로 일그러져 있습니다."
+      },
+      {
+        id: "arcturus",
+        name: "아크투루스 (Arcturus)",
+        constellation: "목동자리 알파",
+        apparentMag: -0.05,
+        absoluteMag: -0.3,
+        parallax: 0.089,
+        parallaxStr: "0.089\"",
+        distanceLy: "37",
+        temperature: 4300,
+        color: "주황색 (분광형 K1)",
+        colorHex: "#FFA500",
+        desc: "봄철 북쪽 하늘에서 가장 밝게 빛나는 목동자리의 주황색 거성입니다. 헬륨 핵융합을 진행하며 부풀어 오른 상태로, 태양보다 나이가 훨씬 많으며 은은한 붉은 광채를 방출합니다."
+      },
+      {
+        id: "antares",
+        name: "안타레스 (Antares)",
+        constellation: "전갈자리 알파",
+        apparentMag: 1.06,
+        absoluteMag: -5.3,
+        parallax: 0.0059,
+        parallaxStr: "0.0059\"",
+        distanceLy: "550",
+        temperature: 3500,
+        color: "붉은색 (분광형 M1)",
+        colorHex: "#FF3333",
+        desc: "전갈자리의 심장 부근에 붉게 타오르는 붉은색 초거성입니다. 이름은 '화성에 필적하는 자'라는 뜻으로, 황도 근처에서 화성과 붉은빛 경쟁을 벌이는 아름다운 노년기의 거대한 항성입니다."
+      },
+      {
+        id: "pollux",
+        name: "폴룩스 (Pollux)",
+        constellation: "쌍둥이자리 베타",
+        apparentMag: 1.14,
+        absoluteMag: 1.09,
+        parallax: 0.096,
+        parallaxStr: "0.096\"",
+        distanceLy: "34",
+        temperature: 4900,
+        color: "주황색 (분광형 K0)",
+        colorHex: "#FFB366",
+        desc: "쌍둥이자리의 머리 부분에 해당하지만, 실제로는 형인 카스토르보다 밝은 주황색 거성입니다. 태양의 약 9배 크기로 팽창했으며, 외계 행성을 거느리고 있는 것이 관측으로 확인되었습니다."
+      },
+      {
+        id: "procyon",
+        name: "프로키온 (Procyon)",
+        constellation: "작은개자리 알파",
+        apparentMag: 0.34,
+        absoluteMag: 2.6,
+        parallax: 0.286,
+        parallaxStr: "0.286\"",
+        distanceLy: "11.4",
+        temperature: 6500,
+        color: "황백색 (분광형 F5)",
+        colorHex: "#FFFFE0",
+        desc: "겨울철 밤하늘 대삼각형의 일원인 밝은 황백색 별입니다. 밤하늘 최고 광성인 시리우스보다 조금 먼저 지평선 위로 떠오른다고 하여 그리스어로 '개보다 먼저'라는 재미있는 유래가 있습니다."
+      },
+      {
+        id: "capella",
+        name: "카펠라 (Capella)",
+        constellation: "마차부자리 알파",
+        apparentMag: 0.08,
+        absoluteMag: -0.5,
+        parallax: 0.076,
+        parallaxStr: "0.076\"",
+        distanceLy: "43",
+        temperature: 5700,
+        color: "노란색 (분광형 G8)",
+        colorHex: "#FFFDD0",
+        desc: "마차부자리에 속한 0등급의 노란색 별입니다. 겉보기에는 태양과 온도가 비슷한 노란 별 1개처럼 보이지만, 망원경으로 자세히 들여다보면 노란색 거성 2개가 쌍을 지어 도는 연성계입니다."
+      },
+      {
+        id: "altair",
+        name: "알타이르 (Altair/견우성)",
+        constellation: "독수리자리 알파",
+        apparentMag: 0.77,
+        absoluteMag: 2.2,
+        parallax: 0.194,
+        parallaxStr: "0.194\"",
+        distanceLy: "16.7",
+        temperature: 7700,
+        color: "흰색 (분광형 A7)",
+        colorHex: "#FFFFFF",
+        desc: "칠월칠석 전설 속 견우성에 해당하는 별입니다. 자전 속도가 시속 90만 km로 매우 빨라 원심력에 의해 적도 부위가 납작하게 부풀어 오른 독특한 계란 모양을 하고 있습니다."
+      }
+    ];
+
+    /* ==========================================
+       B. 전역 상태 관리 & 초기화
+       ========================================== */
+    let activeStarId = "sirius";
+    let posterTheme = "purple";
+
+    window.onload = function() {
+      // 1. 우주 별 반짝임 배경 활성화
+      initStarsBackground();
+      
+      // 2. 1단계 개념 실험실 시뮬레이터 구동
+      initParallaxSimulator();
+      initMagnitudeSimulator();
+      initTemperatureSimulator();
+
+      // 3. 2단계 별 탐색기 목록 렌더링 및 디테일 정보 로딩
+      renderStarList();
+      selectStar("sirius");
+
+      // 4. 3단계 포스터 스튜디오 셀렉트 박스 채우기
+      populateStarSelector();
+
+      // 5. 포스터 초기 캔버스 그리기
+      setTimeout(drawPoster, 300); // 폰트 로딩 대기 후 렌더링
+    };
+
+    // 탭 전환 함수 (Tab Switcher)
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      document.getElementById(tabId).classList.add('active');
+      // 이벤트 클릭 타겟 활성화
+      const clickedBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => btn.innerText.includes(
+        tabId === 'concept-lab' ? '개념 실험실' : (tabId === 'star-explorer' ? '별 탐색기' : '포스터 제작소')
+      ));
+      if (clickedBtn) clickedBtn.classList.add('active');
+
+      // 탭 전환 시 캔버스나 시뮬레이션 새로고침
+      if (tabId === 'concept-lab') {
+        resizeParallaxCanvas();
+      } else if (tabId === 'poster-creator') {
+        drawPoster();
+      }
+    }
+
+    /* ==========================================
+       C. 백그라운드 별 반짝임 (Canvas)
+       ========================================== */
+    function initStarsBackground() {
+      const canvas = document.getElementById("stars-background");
+      const ctx = canvas.getContext("2d");
+      let stars = [];
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener("resize", resize);
+      resize();
+
+      // 별 생성
+      for (let i = 0; i < 150; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 1.5,
+          alpha: Math.random(),
+          speed: Math.random() * 0.02 + 0.005
+        });
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#fff";
+        
+        stars.forEach(star => {
+          star.alpha += star.speed;
+          if (star.alpha > 1 || star.alpha < 0) {
+            star.speed = -star.speed;
+          }
+          ctx.globalAlpha = Math.max(0.1, star.alpha);
+          ctx.beginPath();
+          ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+
+    /* ==========================================
+       D. 🔬 1단계: 개념 실험실 시뮬레이터 로직
+       ========================================== */
+    
+    // 1) 연주시차 시뮬레이터
+    let parallaxCanvas, parallaxCtx;
+    let earthAngle = 0;
+    
+    function initParallaxSimulator() {
+      parallaxCanvas = document.getElementById("parallax-canvas");
+      parallaxCtx = parallaxCanvas.getContext("2d");
+      const distSlider = document.getElementById("parallax-dist-slider");
+
+      // 슬라이더 조작 이벤트 연결
+      distSlider.addEventListener("input", function() {
+        const dist = parseFloat(this.value);
+        document.getElementById("parallax-dist-val").innerText = dist.toFixed(1) + " 광년";
+        
+        // 연주시차 계산 공식 p" = 1 / d (초 단위, 여기선 직관적인 임의 비례식으로 연출)
+        // 1 pc = 3.26 광년이므로 거리를 파섹으로 변환: d_pc = dist / 3.26
+        const distPc = dist / 3.26;
+        const angle = 1 / distPc;
+        document.getElementById("parallax-angle-val").innerText = angle.toFixed(3) + "\"";
+      });
+
+      // 애니메이션 프레임 동작 시작
+      resizeParallaxCanvas();
+      window.addEventListener("resize", resizeParallaxCanvas);
+      animateParallax();
+    }
+
+    function resizeParallaxCanvas() {
+      if (parallaxCanvas && parallaxCanvas.parentElement) {
+        parallaxCanvas.width = parallaxCanvas.parentElement.clientWidth;
+        parallaxCanvas.height = parallaxCanvas.parentElement.clientHeight;
+      }
+    }
+
+    function animateParallax() {
+      if (!parallaxCanvas) return;
+      
+      const width = parallaxCanvas.width;
+      const height = parallaxCanvas.height;
+      
+      // 뷰포트 크기가 0일 때 리턴 (탭 전환 등으로 감춰진 경우)
+      if (width === 0 || height === 0) {
+        requestAnimationFrame(animateParallax);
+        return;
+      }
+
+      parallaxCtx.clearRect(0, 0, width, height);
+
+      // 슬라이더 값 획득
+      const distSlider = document.getElementById("parallax-dist-slider");
+      const dist = parseFloat(distSlider.value);
+      
+      // 기하학적 파라미터 세팅
+      const sunX = width / 2;
+      const sunY = height * 0.75;
+      const orbitRadX = 65; // 지구 공전궤도 장반경
+      const orbitRadY = 18; // 지구 공전궤도 단반경 (비스듬한 원)
+
+      // 1. 공전 궤도 그리기
+      parallaxCtx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+      parallaxCtx.lineWidth = 1.5;
+      parallaxCtx.beginPath();
+      parallaxCtx.ellipse(sunX, sunY, orbitRadX, orbitRadY, 0, 0, Math.PI * 2);
+      parallaxCtx.stroke();
+
+      // 2. 태양 그리기
+      parallaxCtx.fillStyle = "#f59e0b";
+      parallaxCtx.shadowColor = "#f59e0b";
+      parallaxCtx.shadowBlur = 15;
+      parallaxCtx.beginPath();
+      parallaxCtx.arc(sunX, sunY, 12, 0, Math.PI * 2);
+      parallaxCtx.fill();
+      parallaxCtx.shadowBlur = 0; // 그림자 초기화
+
+      // 3. 지구 공전 위치 계산 및 렌더링
+      earthAngle += 0.015; // 지구 공전 속도
+      const earthX = sunX + Math.cos(earthAngle) * orbitRadX;
+      const earthY = sunY + Math.sin(earthAngle) * orbitRadY;
+
+      // 6개월 뒤 지구 위치 (반대편)
+      const earthOppositeX = sunX - Math.cos(earthAngle) * orbitRadX;
+      const earthOppositeY = sunY - Math.sin(earthAngle) * orbitRadY;
+
+      // 지구 그리기 (현재 지구)
+      parallaxCtx.fillStyle = "#3b82f6";
+      parallaxCtx.shadowColor = "#3b82f6";
+      parallaxCtx.shadowBlur = 8;
+      parallaxCtx.beginPath();
+      parallaxCtx.arc(earthX, earthY, 6, 0, Math.PI * 2);
+      parallaxCtx.fill();
+      parallaxCtx.shadowBlur = 0;
+      parallaxCtx.fillStyle = "#fff";
+      parallaxCtx.font = "bold 9px sans-serif";
+      parallaxCtx.fillText("지구(현재)", earthX + 8, earthY + 3);
+
+      // 6개월 전/후 지구 위치 표시 (반투명 파란색)
+      parallaxCtx.fillStyle = "rgba(59, 130, 246, 0.4)";
+      parallaxCtx.beginPath();
+      parallaxCtx.arc(earthOppositeX, earthOppositeY, 5, 0, Math.PI * 2);
+      parallaxCtx.fill();
+      parallaxCtx.fillText("지구(6개월 후)", earthOppositeX - 70, earthOppositeY + 3);
+
+      // 4. 탐구 대상 별의 실제 위치 결정 (슬라이더 거리값 반영)
+      // 별은 태양의 바로 수직 상단에 위치시킨다. 슬라이더가 2일 때 가장 아래(가깝게), 15일 때 가장 위(멀게)
+      const maxDistOffset = height * 0.45;
+      const minDistOffset = height * 0.15;
+      const starY = sunY - (minDistOffset + (dist - 2) * (maxDistOffset / 13));
+      const starX = sunX;
+
+      // 대상 별 그리기
+      parallaxCtx.fillStyle = "#facc15";
+      parallaxCtx.shadowColor = "#facc15";
+      parallaxCtx.shadowBlur = 12;
+      parallaxCtx.beginPath();
+      parallaxCtx.arc(starX, starY, 7, 0, Math.PI * 2);
+      parallaxCtx.fill();
+      parallaxCtx.shadowBlur = 0;
+      parallaxCtx.fillStyle = "#fff";
+      parallaxCtx.fillText("탐구 별", starX + 10, starY + 3);
+
+      // 5. 시선선(Line of Sight) 및 각도 보조선 그리기
+      // 현재 지구 -> 탐구 별 -> 천구 배경
+      // 배경의 Y좌표는 대략 하늘 뷰 경계 (height * 0.12)
+      const skyY = height * 0.15;
+      
+      // 기하 공식에 의한 시선 연장선 배경 천구 교점 구하기
+      const calcIntersectionX = (ex, ey, sx, sy) => {
+        const slope = (sy - ey) / (sx - ex);
+        return ex + (skyY - ey) / slope;
+      };
+
+      const skyIntersectX = calcIntersectionX(earthX, earthY, starX, starY);
+      const skyIntersectOppositeX = calcIntersectionX(earthOppositeX, earthOppositeY, starX, starY);
+
+      // 점선 렌더링
+      parallaxCtx.setLineDash([3, 4]);
+      parallaxCtx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+      parallaxCtx.lineWidth = 1;
+      
+      // 현재 지구에서 별을 거쳐 하늘로 향하는 시선
+      parallaxCtx.beginPath();
+      parallaxCtx.moveTo(earthX, earthY);
+      parallaxCtx.lineTo(skyIntersectX, skyY);
+      parallaxCtx.stroke();
+
+      // 6개월 후 지구에서 별을 거쳐 하늘로 향하는 시선
+      parallaxCtx.beginPath();
+      parallaxCtx.moveTo(earthOppositeX, earthOppositeY);
+      parallaxCtx.lineTo(skyIntersectOppositeX, skyY);
+      parallaxCtx.stroke();
+      parallaxCtx.setLineDash([]); // 점선 원복
+
+      // 지구-별-태양 사이의 기하학적 각도 삼각형 라인 그리기
+      parallaxCtx.strokeStyle = "rgba(6, 182, 212, 0.4)";
+      parallaxCtx.lineWidth = 1.2;
+      parallaxCtx.beginPath();
+      parallaxCtx.moveTo(earthX, earthY);
+      parallaxCtx.lineTo(starX, starY);
+      parallaxCtx.lineTo(earthOppositeX, earthOppositeY);
+      parallaxCtx.stroke();
+
+      // 연주시차(p) 각도 텍스트 표기
+      parallaxCtx.fillStyle = "var(--color-secondary)";
+      parallaxCtx.font = "11px sans-serif";
+      parallaxCtx.fillText("연주시차(p)", starX - 25, starY + 20);
+
+      // 6. 상단 하늘 뷰 영역에 투영된 가상 별 렌더링
+      // 하늘 폭(width - 20)을 좌우 범위로 사용하고, 별의 위치 변화(시차)를 렌더링.
+      // 시차의 실시간 겉보기 중심은 50%(width / 2)이며 좌우로 진동하게 됨.
+      const skyStar = document.getElementById("parallax-sky-star");
+      if (skyStar) {
+        // 지구 공전에 따라 좌우 좌표(left %)를 계산
+        // 시선선이 천구에 교차하는 X좌표를 퍼센티지로 환산
+        const skyLeftPercent = (skyIntersectX / width) * 100;
+        skyStar.style.left = `calc(${skyLeftPercent}% - 6px)`;
+      }
+
+      requestAnimationFrame(animateParallax);
+    }
+
+    // 2) 등급 시뮬레이터
+    function initMagnitudeSimulator() {
+      const distSlider = document.getElementById("mag-distance-slider");
+
+      distSlider.addEventListener("input", function() {
+        updateMagnitudeView(parseFloat(this.value));
+      });
+
+      // 초기값 렌더링
+      updateMagnitudeView(5.0);
+    }
+
+    function setMagDistance(val) {
+      const slider = document.getElementById("mag-distance-slider");
+      slider.value = val;
+      updateMagnitudeView(val);
+    }
+
+    function updateMagnitudeView(distancePc) {
+      // 10pc 환산 설명
+      document.getElementById("mag-distance-val").innerText = `${distancePc.toFixed(1)} pc (약 ${(distancePc * 3.26).toFixed(1)} 광년)`;
+
+      // 이 시뮬레이션용 가상 별의 절대 등급(M)은 2.0등급으로 고정
+      const absoluteMag = 2.0;
+      
+      // 포뮬러 계산: m - M = 5 log10(d) - 5 => m = M + 5 log10(d) - 5
+      const apparentMag = absoluteMag + 5 * Math.log10(distancePc) - 5;
+
+      // 화면 표시 업데이트
+      document.getElementById("apparent-mag-val").innerText = apparentMag.toFixed(2) + " 등급";
+      document.getElementById("absolute-mag-val").innerText = absoluteMag.toFixed(1) + " 등급";
+
+      // 겉보기 별 밝기 구체 크기 & 글로우 조절
+      // 등급이 낮을수록(작은 수, 마이너스 수) 눈에 밝게 보임 -> 더 커짐
+      // 시각화를 위해 반지름(size) 공식 디자인
+      // 6등급 이하로 매우 어두워지면 아주 작게 보이도록 처리
+      let sizeScale = 40;
+      if (apparentMag < 0) {
+        sizeScale = 45 + Math.abs(apparentMag) * 8;
+      } else {
+        sizeScale = Math.max(4, 40 - apparentMag * 8);
+      }
+
+      const apparentSphere = document.getElementById("apparent-star-sphere");
+      apparentSphere.style.width = sizeScale + "px";
+      apparentSphere.style.height = sizeScale + "px";
+      // 글로우 광채도 크기에 비례하여 다이내믹하게
+      apparentSphere.style.boxShadow = `0 0 ${sizeScale / 1.5}px #fffbf0`;
+
+      // 절대 등급 구체 크기는 항상 10pc일 때의 크기(M=2.0)로 고정
+      const absSphere = document.getElementById("absolute-star-sphere");
+      absSphere.style.width = "30px";
+      absSphere.style.height = "30px";
+      absSphere.style.boxShadow = "0 0 15px #fffbf0";
+
+      // 관계 텍스트 & 수식 매핑
+      const relText = document.getElementById("mag-relation-text");
+      const formText = document.getElementById("mag-formula-text");
+
+      if (distancePc < 10) {
+        relText.innerText = "별의 거리 < 10pc (겉보기가 실제보다 더 밝게 보임)";
+        relText.style.color = "var(--color-secondary)";
+        formText.innerText = `겉보기 등급(${apparentMag.toFixed(1)}) < 절대 등급(${absoluteMag.toFixed(1)})`;
+      } else if (Math.abs(distancePc - 10) < 0.1) {
+        relText.innerText = "별의 거리 = 10pc (겉보기 밝기와 절대 밝기가 같음)";
+        relText.style.color = "#fff";
+        formText.innerText = `겉보기 등급(${apparentMag.toFixed(1)}) = 절대 등급(${absoluteMag.toFixed(1)})`;
+      } else {
+        relText.innerText = "별의 거리 > 10pc (실제 밝기보다 어둡게 보임)";
+        relText.style.color = "var(--color-primary)";
+        formText.innerText = `겉보기 등급(${apparentMag.toFixed(1)}) > 절대 등급(${absoluteMag.toFixed(1)})`;
+      }
+    }
+
+    // 3) 표면 온도와 색깔 시뮬레이터
+    function initTemperatureSimulator() {
+      const tempSlider = document.getElementById("temp-slider");
+
+      tempSlider.addEventListener("input", function() {
+        updateTemperatureView(parseInt(this.value));
+      });
+
+      // 초기 세팅
+      updateTemperatureView(5800);
+    }
+
+    function updateTemperatureView(temp) {
+      // 100단위 콤마 포맷팅
+      document.getElementById("temp-val").innerText = temp.toLocaleString() + " K";
+
+      // 온도에 따른 흑체(별) 색상 RGB 근사값 연산
+      const color = getStarColorFromTemp(temp);
+
+      const sphere = document.getElementById("temp-star-sphere");
+      sphere.style.backgroundColor = color.hex;
+      sphere.style.boxShadow = `0 0 35px ${color.hex}, 0 0 70px rgba(${color.rgb[0]},${color.rgb[1]},${color.rgb[2]}, 0.5)`;
+
+      // 스펙트럼 화살표 바 포인터 이동 (3000K ~ 30000K 스케일)
+      // 로그 스케일 또는 리니어 스케일 매핑
+      const percent = ((temp - 3000) / (30000 - 3000)) * 100;
+      document.getElementById("temp-pointer").style.left = percent + "%";
+
+      // 분광형 및 예시 매핑
+      const badge = document.getElementById("temp-class-badge");
+      const example = document.getElementById("temp-example-text");
+
+      badge.innerText = `분광형 ${color.spectralType}형`;
+      badge.style.backgroundColor = color.hex;
+      badge.style.color = (temp < 6000) ? "#000" : "#fff"; // 붉은색/노란색 계열에선 검정 글씨 가독성
+
+      example.innerHTML = `대표적인 별: <strong>${color.exampleStar}</strong> (${color.colorName})`;
+    }
+
+    // 온도값 기준 별 색상/분광 정보 계산 헬퍼 함수
+    function getStarColorFromTemp(temp) {
+      if (temp < 3700) {
+        return { hex: "#ff3a21", rgb: [255, 58, 33], spectralType: "M", exampleStar: "베텔게우스, 안타레스", colorName: "붉은색", class: "red" };
+      } else if (temp < 5200) {
+        return { hex: "#ffb255", rgb: [255, 178, 85], spectralType: "K", exampleStar: "아크투루스, 폴룩스", colorName: "주황색", class: "orange" };
+      } else if (temp < 6000) {
+        return { hex: "#fff275", rgb: [255, 242, 117], spectralType: "G", exampleStar: "태양, 카펠라", colorName: "노란색", class: "yellow" };
+      } else if (temp < 7500) {
+        return { hex: "#ffffee", rgb: [255, 255, 238], spectralType: "F", exampleStar: "프로키온", colorName: "황백색", class: "yellow-white" };
+      } else if (temp < 10000) {
+        return { hex: "#f0f5ff", rgb: [240, 245, 255], spectralType: "A", exampleStar: "시리우스, 베가, 알타이르", colorName: "흰색 (청백색)", class: "white" };
+      } else if (temp < 30000) {
+        return { hex: "#aed4ff", rgb: [174, 212, 255], spectralType: "B", exampleStar: "리겔", colorName: "청백색", class: "blue-white" };
+      } else {
+        return { hex: "#3b82f6", rgb: [59, 130, 246], spectralType: "O", exampleStar: "나오스 (매우 고온의 초거성)", colorName: "파란색", class: "blue" };
+      }
+    }
+
+    /* ==========================================
+       E. 🌌 2단계: 별 탐색기 (Star Explorer) 로직
+       ========================================== */
+    function renderStarList() {
+      const container = document.getElementById("star-list-container");
+      container.innerHTML = "";
+
+      starsDatabase.forEach(star => {
+        const item = document.createElement("div");
+        item.className = `star-item ${star.id === activeStarId ? 'active' : ''}`;
+        item.id = `list-item-${star.id}`;
+        item.onclick = () => selectStar(star.id);
+
+        item.innerHTML = `
+          <div class="star-item-info">
+            <span class="star-item-dot" style="color: ${star.colorHex}; background-color: ${star.colorHex};"></span>
+            <div>
+              <span class="star-item-name">${star.name}</span>
+              <span class="star-item-const">${star.constellation}</span>
+            </div>
+          </div>
+          <span class="star-item-mag">${star.apparentMag} 등급</span>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function selectStar(starId) {
+      activeStarId = starId;
+
+      // 활성화 클래스 스위칭
+      document.querySelectorAll(".star-item").forEach(item => {
+        item.classList.remove("active");
+      });
+      const activeItem = document.getElementById(`list-item-${starId}`);
+      if (activeItem) activeItem.classList.add("active");
+
+      // 별 데이터 로드
+      const star = starsDatabase.find(s => s.id === starId);
+      if (!star) return;
+
+      // 도큐먼트 바인딩 업데이트
+      document.getElementById("detail-name").innerText = star.name;
+      document.getElementById("detail-const").innerText = star.constellation;
+      document.getElementById("detail-apparent").innerText = star.apparentMag + " 등급";
+      document.getElementById("detail-absolute").innerText = star.absoluteMag + " 등급";
+      document.getElementById("detail-parallax").innerText = star.parallaxStr;
+      document.getElementById("detail-distance").innerText = star.distanceLy + " 광년";
+      document.getElementById("detail-temp").innerText = star.temperature.toLocaleString() + " K";
+      document.getElementById("detail-color").innerText = star.color;
+      document.getElementById("detail-desc").innerText = star.desc;
+
+      // 색상 테마 효과 적용
+      const avatar = document.getElementById("detail-avatar");
+      avatar.style.backgroundColor = star.colorHex;
+      avatar.style.boxShadow = `0 0 25px ${star.colorHex}`;
+      
+      const detailCard = document.getElementById("star-detail-card");
+      detailCard.style.setProperty('--star-color-theme', star.colorHex);
+      
+      // 아바타 테마 색상 딜레이 애니메이션 리셋
+      avatar.style.transform = "scale(0.8)";
+      setTimeout(() => {
+        avatar.style.transform = "scale(1)";
+      }, 50);
+    }
+
+    // 탐색한 별의 스펙을 포스터 작성 폼으로 연동해주는 기능
+    function loadToPoster() {
+      const star = starsDatabase.find(s => s.id === activeStarId);
+      if (!star) return;
+
+      // 인풋 폼 값 설정
+      document.getElementById("post-star-name").value = star.name;
+      document.getElementById("post-star-const").value = star.constellation;
+      document.getElementById("post-star-apparent").value = star.apparentMag + " 등급";
+      document.getElementById("post-star-absolute").value = star.absoluteMag + " 등급";
+      document.getElementById("post-star-parallax").value = star.parallaxStr;
+      document.getElementById("post-star-distance").value = star.distanceLy + " 광년";
+      document.getElementById("post-star-temp").value = star.temperature.toLocaleString() + " K";
+      document.getElementById("post-star-color").value = star.color.split(" (")[0]; // "주황색 (분광형 K0)"에서 "주황색"만 추출
+
+      // 서술형 문항에도 자동 가이드 문맥 추가 (시작 가이드)
+      generateScientificAnswers(star);
+
+      // 알림 피드백 후 포스터 탭으로 이동
+      alert(`[${star.name}]의 데이터가 3단계 포스터 폼에 입력되었습니다. 3단계로 이동하여 포스터를 편집하세요!`);
+      switchTab('poster-creator');
+      
+      // 포스터 셀렉트 박스 동기화
+      document.getElementById("form-star-select").value = star.id;
+    }
+
+    // 별 데이터 기반 탐구형 예시 질문 답변 셋업
+    function generateScientificAnswers(star) {
+      const q1 = document.getElementById("post-q1");
+      const q2 = document.getElementById("post-q2");
+      const q3 = document.getElementById("post-q3");
+      const q4 = document.getElementById("post-q4");
+
+      // Q1: 연주시차와 거리 관계
+      if (star.id === "sun") {
+        q1.value = "태양은 지구와 가장 가까운 별이라서 공전에 따른 위치 변화를 각도로 재기 어려우며, 연주시차라는 도구를 사용할 필요 없이 광분 단위로 잽니다. 일반적인 우주 규모의 연주시차와 별 거리는 반비례 관계입니다.";
+      } else {
+        q1.value = `${star.name}의 연주시차는 ${star.parallaxStr}입니다. 연주시차와 별의 거리는 반비례하므로, 시차가 작을수록 더 먼 거리에 있는 별입니다. 이 별은 약 ${star.distanceLy} 광년 거리입니다.`;
+      }
+
+      // Q2: 등급을 통한 거리 유추 (10pc=32.6광년 비교)
+      const m = star.apparentMag;
+      const M = star.absoluteMag;
+      if (star.id === "sun") {
+        q2.value = "태양은 겉보기등급(-26.7)이 절대등급(4.8)보다 훨씬 작습니다(m < M). 이는 절대적인 기준선인 10pc(32.6광년)보다 훨씬 우리에게 가까이 있기 때문입니다. 실제 태양까지 거리는 약 8광분입니다.";
+      } else {
+        const isNear = m < M;
+        const compareChar = isNear ? "<" : (m === M ? "=" : ">");
+        const explanation = isNear 
+          ? "겉보기 등급이 절대 등급보다 작다(m < M)는 뜻으로, 10pc에 있을 때보다 우리 눈에 볼 때 더 밝게 보입니다. 즉, 이 별은 기준인 10pc(32.6광년)보다 가까운 거리에 있습니다." 
+          : "겉보기 등급이 절대 등급보다 크다(m > M)는 뜻으로, 10pc에 있을 때보다 지구에서 관측할 때 훨씬 더 어두워 보입니다. 즉, 이 별은 실제 거리가 10pc(32.6광년)보다 먼 곳에 있습니다.";
+        q2.value = `${star.name}은(는) 겉보기 등급(${m}) ${compareChar} 절대 등급(${M}) 관계를 가집니다. 이는 ${explanation} (실제 거리: ${star.distanceLy}광년)`;
+      }
+
+      // Q3: 표면온도와 색상
+      q3.value = `${star.name}의 표면 온도는 ${star.temperature.toLocaleString()}K 이며, 색상은 ${star.color}입니다. 온도가 비교적 ${star.temperature > 8000 ? '높아 백색이나 청백색 계열' : '낮아 황색이나 붉은색 계열'}의 색으로 관찰됩니다.`;
+
+      // Q4: 한 줄 느낀점
+      q4.value = `${star.name}에 대해 탐구하면서 겉보기 등급과 절대 등급의 차이가 거리 때문에 발생한다는 것을 직접 계산하고 눈으로 시각화하여 확인해 볼 수 있어 과학이 흥미로웠습니다.`;
+    }
+
+    /* ==========================================
+       F. 🎨 3단계: 포스터 제작 스튜디오 로직
+       ========================================== */
+    function populateStarSelector() {
+      const select = document.getElementById("form-star-select");
+      starsDatabase.forEach(star => {
+        const opt = document.createElement("option");
+        opt.value = star.id;
+        opt.textContent = star.name;
+        select.appendChild(opt);
+      });
+      // 디폴트값 시리우스 설정
+      select.value = "sirius";
+    }
+
+    function applySelectedStarToForm() {
+      const select = document.getElementById("form-star-select");
+      const starId = select.value;
+      if (!starId) return;
+      activeStarId = starId;
+      selectStar(starId);
+      
+      const star = starsDatabase.find(s => s.id === starId);
+      if (star) {
+        document.getElementById("post-star-name").value = star.name;
+        document.getElementById("post-star-const").value = star.constellation;
+        document.getElementById("post-star-apparent").value = star.apparentMag + " 등급";
+        document.getElementById("post-star-absolute").value = star.absoluteMag + " 등급";
+        document.getElementById("post-star-parallax").value = star.parallaxStr;
+        document.getElementById("post-star-distance").value = star.distanceLy + " 광년";
+        document.getElementById("post-star-temp").value = star.temperature.toLocaleString() + " K";
+        document.getElementById("post-star-color").value = star.color.split(" (")[0];
+
+        generateScientificAnswers(star);
+        drawPoster();
+      }
+    }
+
+    // 테마 설정 기능
+    function setPosterTheme(themeName, element) {
+      posterTheme = themeName;
+      document.querySelectorAll(".theme-chip").forEach(chip => {
+        chip.classList.remove("active");
+      });
+      element.classList.add("active");
+      drawPoster();
+    }
+
+    // 캔버스 드로잉 엔진 (포스터 실시간 빌드)
+    function drawPoster() {
+      const canvas = document.getElementById("poster-canvas");
+      const ctx = canvas.getContext("2d");
+      
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // 1. 테마에 따른 컬러 설정
+      let colorPrimary, colorBgGradientStart, colorBgGradientEnd, accentColor, glowColor;
+      
+      switch (posterTheme) {
+        case 'cyan':
+          colorPrimary = "#00bcd4";
+          colorBgGradientStart = "#04141c";
+          colorBgGradientEnd = "#010406";
+          accentColor = "#00e5ff";
+          glowColor = "rgba(0, 188, 212, 0.35)";
+          break;
+        case 'gold':
+          colorPrimary = "#ffb300";
+          colorBgGradientStart = "#171004";
+          colorBgGradientEnd = "#050301";
+          accentColor = "#ffe082";
+          glowColor = "rgba(255, 179, 0, 0.25)";
+          break;
+        case 'red':
+          colorPrimary = "#ff4d4d";
+          colorBgGradientStart = "#1a0505";
+          colorBgGradientEnd = "#060101";
+          accentColor = "#ffb3b3";
+          glowColor = "rgba(255, 77, 77, 0.3)";
+          break;
+        case 'purple':
+        default:
+          colorPrimary = "#818cf8";
+          colorBgGradientStart = "#0a0721";
+          colorBgGradientEnd = "#020108";
+          accentColor = "#c7d2fe";
+          glowColor = "rgba(129, 140, 248, 0.3)";
+          break;
+      }
+
+      // 2. 포스터 배경 그리기 (우주 분위기)
+      // 메인 그라데이션
+      const bgGrad = ctx.createRadialGradient(w/2, h/2, 100, w/2, h/2, w * 0.8);
+      bgGrad.addColorStop(0, colorBgGradientStart);
+      bgGrad.addColorStop(1, colorBgGradientEnd);
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, w, h);
+
+      // 입체적인 성운(Nebula) 효과 추가 드로잉
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      
+      // 첫 번째 성운 구름 (좌측 하단)
+      const nebulaGrad1 = ctx.createRadialGradient(w * 0.25, h * 0.7, 50, w * 0.25, h * 0.7, 280);
+      nebulaGrad1.addColorStop(0, glowColor);
+      nebulaGrad1.addColorStop(0.5, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = nebulaGrad1;
+      ctx.beginPath();
+      ctx.arc(w * 0.25, h * 0.7, 280, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 두 번째 성운 구름 (우측 상단)
+      const nebulaGrad2 = ctx.createRadialGradient(w * 0.75, h * 0.3, 30, w * 0.75, h * 0.3, 240);
+      nebulaGrad2.addColorStop(0, glowColor);
+      nebulaGrad2.addColorStop(0.5, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = nebulaGrad2;
+      ctx.beginPath();
+      ctx.arc(w * 0.75, h * 0.3, 240, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.restore();
+
+      // 배경 그리드 데코레이션 효과
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.015)";
+      ctx.lineWidth = 1;
+      const gridSize = 45;
+      for (let x = 0; x < w; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, h);
+        ctx.stroke();
+      }
+      for (let y = 0; y < h; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      }
+
+      // 3. 탑 프레임 & 입체감 있는 테두리 그리기
+      // 외곽 두꺼운 보더
+      ctx.strokeStyle = colorPrimary;
+      ctx.lineWidth = 14;
+      ctx.strokeRect(10, 10, w - 20, h - 20);
+
+      // 내측 얇은 광채 보더 (입체감 부여)
+      ctx.save();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+      ctx.lineWidth = 1;
+      ctx.shadowColor = colorPrimary;
+      ctx.shadowBlur = 10;
+      ctx.strokeRect(25, 25, w - 50, h - 50);
+      ctx.restore();
+
+      // 4. 타이틀 렌더링
+      const titleText = document.getElementById("post-title").value || "신비한 항성 탐구 보고서";
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#ffffff";
+      
+      // 타이틀 텍스트 입체 그림자 효과
+      ctx.save();
+      ctx.shadowColor = colorPrimary;
+      ctx.shadowBlur = 12;
+      ctx.shadowOffsetY = 2;
+      ctx.font = "bold 34px 'Noto Sans KR', sans-serif";
+      ctx.fillText(titleText, w / 2, 75);
+      ctx.restore();
+
+      // 서브 타이틀 라인
+      ctx.strokeStyle = colorPrimary;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(120, 95);
+      ctx.lineTo(w - 120, 95);
+      ctx.stroke();
+
+      // 학생 인적사항 기재
+      const authorText = "작성자: " + (document.getElementById("post-author").value || "미입력");
+      ctx.fillStyle = accentColor;
+      ctx.font = "bold 16px 'Noto Sans KR', sans-serif";
+      ctx.fillText(authorText, w / 2, 122);
+
+      // ==========================================
+      // 5. 별 그래픽 비주얼 영역 그리기 (좌상단 박스)
+      // ==========================================
+      const starName = document.getElementById("post-star-name").value || "미정";
+      const starColorText = document.getElementById("post-star-color").value || "흰색";
+      const starTempText = document.getElementById("post-star-temp").value || "6,000 K";
+
+      const visualX = 50;
+      const visualY = 160;
+      const visualW = 320;
+      const visualH = 220;
+
+      // 그래픽 외곽 카드 테두리 및 입체 그림자
+      ctx.save();
+      ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
+      ctx.shadowBlur = 12;
+      ctx.shadowOffsetY = 6;
+      ctx.fillStyle = "rgba(10, 10, 25, 0.6)";
+      ctx.fillRect(visualX, visualY, visualW, visualH);
+      
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(visualX, visualY, visualW, visualH);
+      ctx.restore();
+
+      // 별의 발광 원 드로잉
+      let starVisualColor = "#ffffff";
+      if (starColorText.includes("붉은") || starColorText.includes("빨간")) starVisualColor = "#ff4500";
+      else if (starColorText.includes("주황")) starVisualColor = "#ffa500";
+      else if (starColorText.includes("노란") || starColorText.includes("황색")) starVisualColor = "#ffea00";
+      else if (starColorText.includes("황백")) starVisualColor = "#ffffee";
+      else if (starColorText.includes("청백") || starColorText.includes("파란")) starVisualColor = "#8ec5fc";
+
+      const sphereCenterX = visualX + visualW / 2;
+      const sphereCenterY = visualY + visualH / 2 - 12;
+      
+      // 다중 레이어로 글로우 효과 구현 (입체감 확대)
+      const radGrad = ctx.createRadialGradient(sphereCenterX, sphereCenterY, 3, sphereCenterX, sphereCenterY, 70);
+      radGrad.addColorStop(0, "#ffffff");
+      radGrad.addColorStop(0.15, starVisualColor);
+      radGrad.addColorStop(0.45, "rgba(" + (starVisualColor === "#ff4500" ? "255,69,0" : (starVisualColor === "#ffa500" ? "255,165,0" : "142,197,252")) + ", 0.25)");
+      radGrad.addColorStop(1, "transparent");
+      
+      ctx.fillStyle = radGrad;
+      ctx.beginPath();
+      ctx.arc(sphereCenterX, sphereCenterY, 75, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 성광(십자 크로스) 스파이크 라인 데코레이션
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.7)";
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(sphereCenterX - 45, sphereCenterY);
+      ctx.lineTo(sphereCenterX + 45, sphereCenterY);
+      ctx.moveTo(sphereCenterX, sphereCenterY - 45);
+      ctx.lineTo(sphereCenterX, sphereCenterY + 45);
+      ctx.stroke();
+
+      // 별 라벨 텍스트 (글씨 키움)
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 20px 'Noto Sans KR', sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("★ " + starName, sphereCenterX, visualY + visualH - 30);
+      ctx.fillStyle = accentColor;
+      ctx.font = "bold 13px 'Noto Sans KR', sans-serif";
+      ctx.fillText("표면 온도: " + starTempText + " / 색상: " + starColorText, sphereCenterX, visualY + visualH - 12);
+
+      // ==========================================
+      // 6. 별 상세 스펙 렌더링 (우상단 영역)
+      // ==========================================
+      const specX = 390;
+      const specY = 160;
+      const specW = 360;
+      const specH = 220;
+
+      ctx.save();
+      ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
+      ctx.shadowBlur = 12;
+      ctx.shadowOffsetY = 6;
+      ctx.fillStyle = "rgba(10, 10, 25, 0.6)";
+      ctx.fillRect(specX, specY, specW, specH);
+      
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(specX, specY, specW, specH);
+      ctx.restore();
+
+      // 스펙 테이블 헤더
+      ctx.fillStyle = colorPrimary;
+      ctx.fillRect(specX, specY, specW, 35);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 15px 'Noto Sans KR', sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText("■ 별의 물리 탐구 정보 (Stellar Specs)", specX + 15, specY + 23);
+
+      // 상세 항목 리스트 (글자 크기를 15px로 확대)
+      const specsList = [
+        { label: "별자리", val: document.getElementById("post-star-const").value },
+        { label: "겉보기 등급 (m)", val: document.getElementById("post-star-apparent").value },
+        { label: "절대 등급 (M)", val: document.getElementById("post-star-absolute").value },
+        { label: "연주시차 (p)", val: document.getElementById("post-star-parallax").value },
+        { label: "지구까지 거리", val: document.getElementById("post-star-distance").value }
+      ];
+
+      ctx.font = "500 15px 'Noto Sans KR', sans-serif";
+      specsList.forEach((spec, idx) => {
+        const itemY = specY + 68 + (idx * 28);
+        ctx.fillStyle = accentColor;
+        ctx.textAlign = "left";
+        ctx.fillText(spec.label, specX + 20, itemY);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.textAlign = "right";
+        ctx.fillText(spec.val, specX + specW - 20, itemY);
+
+        // 구분 점선
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(specX + 15, itemY + 8);
+        ctx.lineTo(specX + specW - 15, itemY + 8);
+        ctx.stroke();
+      });
+
+      // ==========================================
+      // 7. 서술형 탐구 질문 답변 (하단 영역)
+      // ==========================================
+      const qBoxX = 50;
+      const qBoxW = 700;
+      const qStartY = 410;
+
+      // 텍스트 줄바꿈 도우미 함수 (행간을 23px로 조절하여 15px 폰트에 대응)
+      function wrapText(text, x, y, maxWidth, lineHeight) {
+        const words = text.split("");
+        let line = "";
+        let testLine = "";
+        let currentY = y;
+
+        for (let n = 0; n < words.length; n++) {
+          testLine = line + words[n];
+          const metrics = ctx.measureText(testLine);
+          const testWidth = metrics.width;
+          if (testWidth > maxWidth && n > 0) {
+            ctx.fillText(line, x, currentY);
+            line = words[n];
+            currentY += lineHeight;
+          } else {
+            line = testLine;
+          }
+        }
+        ctx.fillText(line, x, currentY);
+        return currentY;
+      }
+
+      const questions = [
+        {
+          num: "Q1",
+          question: "이 별의 연주시차와 지구로부터의 거리는 어떤 관계가 있나요?",
+          answer: document.getElementById("post-q1").value
+        },
+        {
+          num: "Q2",
+          question: "겉보기 등급과 절대 등급을 비교할 때, 이 별은 10pc(32.6광년)보다 가까울까요 멀까요? 그 이유는?",
+          answer: document.getElementById("post-q2").value
+        },
+        {
+          num: "Q3",
+          question: "표면 온도와 별의 색깔을 통해 알아본 이 별의 특징은 무엇인가요?",
+          answer: document.getElementById("post-q3").value
+        },
+        {
+          num: "느낀 점 및 소감",
+          question: "이번 별과 우주 가상실험 및 포스터 제작 탐구 활동 소감",
+          answer: document.getElementById("post-q4").value
+        }
+      ];
+
+      let runningY = qStartY;
+
+      questions.forEach((q, idx) => {
+        // 백그라운드 블록 카드화 (입체 그림자 효과 추가)
+        const cardH = (idx === 3) ? 120 : 135; // 느낀점 박스는 컴팩트하게
+        
+        ctx.save();
+        ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetY = 4;
+        
+        ctx.fillStyle = "rgba(255, 255, 255, 0.02)";
+        ctx.fillRect(qBoxX, runningY, qBoxW, cardH);
+        
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(qBoxX, runningY, qBoxW, cardH);
+        ctx.restore();
+
+        // 왼쪽에 입체감을 주는 두꺼운 테마 컬러 바 그리기
+        ctx.fillStyle = colorPrimary;
+        ctx.fillRect(qBoxX, runningY, 5, cardH);
+
+        // 질문 텍스트 출력 (글자 크기 16px로 확대 및 동적 텍스트 겹침 방지)
+        ctx.textAlign = "left";
+        ctx.font = "bold 16px 'Noto Sans KR', sans-serif";
+        ctx.fillStyle = colorPrimary;
+        
+        // [번호] 렌더링 후 가로 길이를 재서 질문 텍스트를 그 옆에 그린다. (오버랩 완벽 해결)
+        const numTag = `[${q.num}]`;
+        ctx.fillText(numTag, qBoxX + 15, runningY + 25);
+        const tagWidth = ctx.measureText(numTag).width;
+        
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(q.question, qBoxX + 15 + tagWidth + 8, runningY + 25);
+
+        // 답변 텍스트 출력 (글자 크기 15px로 확대, 줄바꿈 고려)
+        ctx.fillStyle = "rgba(240, 245, 255, 0.9)";
+        ctx.font = "400 15px 'Noto Sans KR', sans-serif";
+        
+        // 텍스트 너비 660px 제한, 행간 22px
+        wrapText(q.answer, qBoxX + 20, runningY + 54, qBoxW - 40, 22);
+
+        runningY += cardH + 18;
+      });
+
+      // 우측 하단 워터마크 데코레이션
+      ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
+      ctx.textAlign = "right";
+      ctx.font = "11px 'Outfit', sans-serif";
+      ctx.fillText("EDUCATIONAL SCIENCE LABORATORY - STELLAR APP", w - 30, h - 25);
+    }
+
+    // 포스터 이미지 저장 다운로드
+    function downloadPosterImage() {
+      const canvas = document.getElementById("poster-canvas");
+      const starName = document.getElementById("post-star-name").value || "Stellar";
+      const cleanName = starName.replace(/[^\w\sㄱ-힣]/g, "").trim().replace(/\s+/g, "_");
+      
+      const link = document.createElement("a");
+      link.download = `${cleanName}_과학포스터.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    }
+  </script>
+</body>
+</html>
