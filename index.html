@@ -1013,7 +1013,7 @@
     .poster-canvas-container {
       width: 100%;
       max-width: 450px;
-      aspect-ratio: 1 / 1.414; /* A4 비율 */
+      /* 기본은 A4 비율(800x1130). 답변이 매우 길면 캔버스가 세로로 늘어나며, 비율은 캔버스를 따름 */
       background: #000;
       border-radius: 12px;
       overflow: hidden;
@@ -1024,7 +1024,7 @@
 
     #poster-canvas {
       width: 100%;
-      height: 100%;
+      height: auto;
       display: block;
     }
 
@@ -1465,7 +1465,7 @@
                 </div>
                 <div class="form-group">
                   <label for="post-star-color">별의 색깔</label>
-                  <input type="text" id="post-star-color" value="청백색">
+                  <input type="text" id="post-star-color" value="흰색">
                 </div>
               </div>
             </div>
@@ -1558,7 +1558,7 @@
         parallaxStr: "0.379\"",
         distancePc: "2.64",
         temperature: 9940,
-        color: "청백색 (분광형 A1)",
+        color: "흰색 (분광형 A1)",
         colorHex: "#E6F2FF",
         desc: "태양을 제외하고 지구 밤하늘에서 눈으로 보기에 가장 밝은 별입니다. 절대등급도 1.4등급으로 높은 편이며, 지구와 2.64pc(약 8.6광년)로 매우 가깝기 때문에 겉보기 등급이 매우 낮게(밝게) 관측됩니다."
       },
@@ -1600,7 +1600,7 @@
         parallaxStr: "0.129\"",
         distancePc: "7.75",
         temperature: 9600,
-        color: "청백색 (분광형 A0)",
+        color: "흰색 (분광형 A0)",
         colorHex: "#F0F8FF",
         desc: "여름철 밤하늘을 대표하는 직녀성입니다. 오랫동안 별의 밝기(등급) 시스템에서 0등급의 기준점으로 사용되었습니다. 지구에서 7.75pc(약 25광년) 떨어져 있습니다."
       },
@@ -1666,8 +1666,8 @@
         constellation: "처녀자리 알파",
         apparentMag: 0.98,
         absoluteMag: -3.55,
-        parallax: 0.012,
-        parallaxStr: "0.012\"",
+        parallax: 0.013,
+        parallaxStr: "0.013\"",
         distancePc: "77.0",
         temperature: 22400,
         color: "청백색 (분광형 B1)",
@@ -1693,14 +1693,14 @@
         name: "베텔게우스 (Betelgeuse)",
         constellation: "오리온자리 알파",
         apparentMag: 0.5,
-        absoluteMag: -5.1,
-        parallax: 0.005,
-        parallaxStr: "0.005\"",
-        distancePc: "196",
+        absoluteMag: -5.85,
+        parallax: 0.0060,
+        parallaxStr: "0.0060\"",
+        distancePc: "168",
         temperature: 3500,
         color: "붉은색 (분광형 M1)",
         colorHex: "#FF5533",
-        desc: "오리온자리의 어깨에 위치한 적색 초거성입니다. 지구에서 약 196pc 거리에 떨어져 있으며, 수명이 다해 팽창했기 때문에 태양 크기의 900배가 넘는 우주급 규모를 지니고 있습니다."
+        desc: "오리온자리의 어깨에 위치한 적색 초거성입니다. 지구에서 약 168pc 거리에 있으며(측정 방법에 따라 150~220pc로 차이가 있음), 수명이 다해 팽창했기 때문에 반지름이 태양의 약 700배에 이르는 거대한 별입니다. 밝기가 0.0~1.6등급 사이에서 변하는 변광성이기도 합니다."
       },
       {
         id: "rigel",
@@ -1722,13 +1722,13 @@
         constellation: "백조자리 알파",
         apparentMag: 1.25,
         absoluteMag: -8.38,
-        parallax: 0.001,
-        parallaxStr: "0.001\"",
+        parallax: 0.00125,
+        parallaxStr: "약 0.0012\"",
         distancePc: "802",
         temperature: 8525,
-        color: "청백색 (분광형 A2)",
+        color: "흰색 (분광형 A2)",
         colorHex: "#E0F7FA",
-        desc: "백조자리의 꼬리에 위치한 백색 초거성입니다. 연주시차가 불과 0.001\" 수준으로 무려 800pc 이상 떨어져 있지만, 태양 광도의 20만 배에 이르는 절대적 에너지 덕분에 1등성으로 관찰됩니다."
+        desc: "백조자리의 꼬리에 위치한 백색 초거성입니다. 연주시차가 약 0.0012\"로 너무 작아 정확히 재기 어려워 다른 방법으로 거리를 추정하는데, 약 800pc나 떨어져 있지만 태양 광도의 20만 배에 이르는 절대적 에너지 덕분에 1등성으로 관찰됩니다."
       }
     ];
 
@@ -2350,7 +2350,25 @@
     function drawPoster() {
       const canvas = document.getElementById("poster-canvas");
       const ctx = canvas.getContext("2d");
-      
+
+      // ── 핵심 개념 탐구 보고 레이아웃을 먼저 계산 (내용 전체가 들어가도록) ──
+      const BASE_HEIGHT = 1130;          // 기본 A4 비율 높이
+      const qCardY = 595;                // 탐구 보고 카드 시작 위치
+      const qaItems = [
+        { q: "Q1. 연주시차와 거리(pc) 관계", a: document.getElementById("post-q1").value },
+        { q: "Q2. 등급 비교 분석",           a: document.getElementById("post-q2").value },
+        { q: "Q3. 온도와 색깔 특징",         a: document.getElementById("post-q3").value },
+        { q: "💡 느낀점",                    a: document.getElementById("post-q4").value }
+      ];
+      const qaWidth = (canvas.width - 120) - 50;
+      // 기본 높이에서 쓸 수 있는 공간: 카드 제목 아래 ~ 카드 하단 여백
+      const qaAvailable = (BASE_HEIGHT - 60 - qCardY) - 70;
+      const qaLayout = layoutQA(ctx, qaItems, qaWidth, qaAvailable);
+
+      // 최소 글꼴로도 넘치면 포스터를 세로로 늘림 (내용이 잘리지 않도록)
+      const neededHeight = Math.max(BASE_HEIGHT, BASE_HEIGHT + (qaLayout.height - qaAvailable));
+      if (canvas.height !== Math.ceil(neededHeight)) canvas.height = Math.ceil(neededHeight);
+
       const w = canvas.width;
       const h = canvas.height;
 
@@ -2492,8 +2510,7 @@
         ctx.font = "14px sans-serif";
       });
 
-      const qCardY = 595;
-      const qCardH = 475;
+      const qCardH = h - 60 - qCardY;
       ctx.fillStyle = "rgba(10, 10, 30, 0.75)";
       ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
       ctx.beginPath();
@@ -2505,15 +2522,7 @@
       ctx.font = "bold 16px sans-serif";
       ctx.fillText("📝 핵심 개념 탐구 보고", cardX + 20, qCardY + 30);
 
-      const q1Val = document.getElementById("post-q1").value;
-      const q2Val = document.getElementById("post-q2").value;
-      const q3Val = document.getElementById("post-q3").value;
-      const q4Val = document.getElementById("post-q4").value;
-
-      drawWrappedText(ctx, `Q1. 연주시차와 거리(pc) 관계: ${q1Val}`, cardX + 25, qCardY + 65, cardW - 50, 20, 2);
-      drawWrappedText(ctx, `Q2. 등급 비교 분석: ${q2Val}`, cardX + 25, qCardY + 165, cardW - 50, 20, 2);
-      drawWrappedText(ctx, `Q3. 온도와 색깔 특징: ${q3Val}`, cardX + 25, qCardY + 265, cardW - 50, 20, 2);
-      drawWrappedText(ctx, `💡 느낀점: ${q4Val}`, cardX + 25, qCardY + 375, cardW - 50, 20, 2);
+      drawQA(ctx, qaLayout, cardX + 25, qCardY + 62, accentColor);
 
       ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
       ctx.font = "12px sans-serif";
@@ -2521,33 +2530,84 @@
       ctx.fillText("© 2026 STELLAR LAB - Virtual Space Science Experiment Laboratory", w / 2, h - 40);
     }
 
-    function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
-      ctx.fillStyle = "#e2e8f0";
-      ctx.font = "13px 'Outfit', 'Noto Sans KR', sans-serif";
-      ctx.textAlign = "left";
+    const POSTER_FONT = "'Outfit', 'Noto Sans KR', sans-serif";
 
-      let words = text.split('');
-      let line = '';
-      let lineCount = 0;
-
-      for (let n = 0; n < words.length; n++) {
-        let testLine = line + words[n];
-        let metrics = ctx.measureText(testLine);
-        let testWidth = metrics.width;
-        if (testWidth > maxWidth && n > 0) {
-          ctx.fillText(line, x, y);
-          line = words[n];
-          y += lineHeight;
-          lineCount++;
-          if (lineCount >= maxLines - 1 && n < words.length - 1) {
-            line = line + "...";
-            break;
+    // 텍스트를 주어진 너비에 맞게 줄 단위로 나눔 (띄어쓰기 기준, 긴 단어는 글자 단위로 분할, 줄바꿈 유지)
+    function wrapLines(ctx, text, maxWidth) {
+      const result = [];
+      String(text || "").split(/\r?\n/).forEach(para => {
+        const words = para.split(" ");
+        let line = "";
+        words.forEach(word => {
+          const test = line ? line + " " + word : word;
+          if (ctx.measureText(test).width <= maxWidth) {
+            line = test;
+            return;
           }
-        } else {
-          line = testLine;
-        }
+          if (line) result.push(line);
+          // 한 단어가 너비보다 길면 글자 단위로 자름
+          line = "";
+          for (const ch of word) {
+            if (ctx.measureText(line + ch).width > maxWidth && line) {
+              result.push(line);
+              line = ch;
+            } else {
+              line += ch;
+            }
+          }
+        });
+        result.push(line);
+      });
+      return result;
+    }
+
+    // 모든 질문·답변이 공간에 들어가는 가장 큰 글꼴 크기를 찾음 (15px → 11px)
+    function layoutQA(ctx, items, maxWidth, availableHeight) {
+      let layout = null;
+      for (let size = 15; size >= 11; size--) {
+        const lineH = Math.round(size * 1.5);
+        const qSize = size + 1;
+        const gap = Math.round(size * 1.1);
+        ctx.font = `${size}px ${POSTER_FONT}`;
+        const blocks = items.map(it => ({ q: it.q, lines: wrapLines(ctx, it.a, maxWidth - 10) }));
+        let height = 0;
+        blocks.forEach((b, i) => {
+          height += qSize * 1.6 + b.lines.length * lineH;
+          if (i < blocks.length - 1) height += gap;
+        });
+        layout = { size, lineH, qSize, gap, blocks, height };
+        if (height <= availableHeight) break;
       }
-      ctx.fillText(line, x, y);
+      return layout;
+    }
+
+    function drawQA(ctx, layout, x, y, accentColor) {
+      ctx.textAlign = "left";
+      ctx.textBaseline = "alphabetic";
+      layout.blocks.forEach((b, i) => {
+        // 질문 제목
+        ctx.fillStyle = accentColor;
+        ctx.font = `bold ${layout.qSize}px ${POSTER_FONT}`;
+        ctx.fillText(b.q, x, y);
+        y += layout.qSize * 1.6;
+        // 답변 전체
+        ctx.fillStyle = "#e2e8f0";
+        ctx.font = `${layout.size}px ${POSTER_FONT}`;
+        b.lines.forEach(line => {
+          ctx.fillText(line, x + 10, y);
+          y += layout.lineH;
+        });
+        // 구분선
+        if (i < layout.blocks.length - 1) {
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(x, y - layout.lineH + layout.gap * 0.9);
+          ctx.lineTo(x + 630, y - layout.lineH + layout.gap * 0.9);
+          ctx.stroke();
+          y += layout.gap;
+        }
+      });
     }
 
     function downloadPosterImage() {
