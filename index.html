@@ -1115,7 +1115,7 @@
     <!-- 헤더 영역 -->
     <header>
       <div class="header-logo">⭐ STELLAR LAB</div>
-      <p>별과 우주 가상 과학 실험실 (중학교 3학년 탐구기반 개념 학습)</p>
+      <p>별과 우주 가상 과학 실험실 (홍대부중 3학년 개념기반 탐구학습)</p>
     </header>
 
     <!-- 수업 안내 가이드 배너 -->
@@ -1475,17 +1475,17 @@
               
               <div class="form-group">
                 <label for="post-q1">Q1. 이 별의 연주시차(p)와 지구로부터의 거리(d)는 어떤 관계가 있나요?</label>
-                <textarea id="post-q1">연주시차(p)와 별의 거리(d)는 p = 1/d 관계의 역수(반비례) 관계입니다. 시리우스의 연주시차는 0.379"이므로, 1 / 0.379 ≈ 2.64pc로 지구에서 비교적 매우 가까운 위치에 있는 별입니다.</textarea>
+                <textarea id="post-q1"></textarea>
               </div>
 
               <div class="form-group" style="margin-top:10px;">
                 <label for="post-q2">Q2. 겉보기 등급과 절대 등급을 비교할 때, 이 별은 10pc보다 가까울까요 멀까요? 그 이유는?</label>
-                <textarea id="post-q2">시리우스는 겉보기등급(-1.46)이 절대등급(1.4)보다 작습니다(m < M). 겉보기등급이 작을수록 밝게 보인다는 의미이므로, 10pc에 두었을 때(절대등급)보다 우리 눈에 볼 때(겉보기등급) 훨씬 밝으므로 이 별은 10pc보다 훨씬 가까운 위치(2.64pc)에 존재합니다.</textarea>
+                <textarea id="post-q2"></textarea>
               </div>
 
               <div class="form-group" style="margin-top:10px;">
                 <label for="post-q3">Q3. 표면 온도와 별의 색깔을 통해 알아본 이 별의 물리적 특징은 무엇인가요?</label>
-                <textarea id="post-q3">시리우스의 표면 온도는 약 9,940K로 매우 높으며 청백색(흰색) 빛을 방출합니다. 이는 태양(5,800K, 노란색)보다 훨씬 뜨겁고 활동적인 주계열성 단계의 별임을 뜻합니다.</textarea>
+                <textarea id="post-q3"></textarea>
               </div>
 
               <div class="form-group" style="margin-top:10px;">
@@ -1653,11 +1653,11 @@
         absoluteMag: -0.63,
         parallax: 0.049,
         parallaxStr: "0.049\"",
-        distancePc: "20.0",
+        distancePc: "20.4",
         temperature: 3910,
         color: "주황색 (분광형 K5)",
         colorHex: "#FF8C00",
-        desc: "황소자리의 붉은 눈에 해당하는 주황색 거성입니다. 연주시차는 0.049\"로 정확히 20pc 거리에 위치합니다. 10pc 기준보다 멀기 때문에 절대등급(-0.63)이 겉보기등급(0.85)보다 훨씬 밝습니다."
+        desc: "황소자리의 붉은 눈에 해당하는 주황색 거성입니다. 연주시차는 0.049\"로 약 20.4pc 거리에 위치합니다. 10pc 기준보다 멀기 때문에 절대등급(-0.63)이 겉보기등급(0.85)보다 훨씬 밝습니다."
       },
       {
         id: "spica",
@@ -1721,8 +1721,8 @@
         constellation: "오리온자리 베타",
         apparentMag: 0.13,
         absoluteMag: -7.8,
-        parallax: 0.0037,
-        parallaxStr: "0.0037\"",
+        parallax: 0.0038,
+        parallaxStr: "0.0038\"",
         distancePc: "264",
         temperature: 12100,
         color: "청백색 (분광형 B8)",
@@ -2321,6 +2321,14 @@
       const q3 = document.getElementById("post-q3");
       const q4 = document.getElementById("post-q4");
 
+      // 태양·폴라리스만 예시 답안을 보여주고, 나머지 별은 학생이 직접 작성하도록 빈칸으로 둠
+      if (star.id !== "sun" && star.id !== "polaris") {
+        q1.value = "";
+        q2.value = "";
+        q3.value = "";
+        return;
+      }
+
       if (star.id === "sun") {
         q1.value = "태양은 지구와 가장 가까운 별이라서 연주시차라는 도구를 사용할 필요 없이 약 0.0000048pc(8광분) 거리에 존재합니다.";
       } else {
@@ -2361,7 +2369,13 @@
        ========================================== */
     function populateStarSelector() {
       const select = document.getElementById("form-star-select");
-      starsDatabase.forEach(star => {
+      // 예시 별(태양 1번, 폴라리스 2번)을 맨 위에 두고 나머지는 기존 순서 유지
+      const sampleIds = ["sun", "polaris"];
+      const orderedStars = [
+        ...sampleIds.map(id => starsDatabase.find(s => s.id === id)).filter(Boolean),
+        ...starsDatabase.filter(s => !sampleIds.includes(s.id))
+      ];
+      orderedStars.forEach(star => {
         const opt = document.createElement("option");
         opt.value = star.id;
         opt.textContent = star.name;
