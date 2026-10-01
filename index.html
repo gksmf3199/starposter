@@ -2071,22 +2071,21 @@
       document.getElementById("apparent-mag-val").innerText = apparentMag.toFixed(2) + " 등급";
       document.getElementById("absolute-mag-val").innerText = absoluteMag.toFixed(1) + " 등급";
 
-      let sizeScale = 40;
-      if (apparentMag < 0) {
-        sizeScale = 45 + Math.abs(apparentMag) * 8;
-      } else {
-        sizeScale = Math.max(4, 40 - apparentMag * 8);
-      }
+      // 같은 등급이면 같은 크기가 되도록 겉보기·절대 등급 모두 하나의 기준으로 크기 계산
+      // (절대 등급 2.0등급 = 30px 기준, 1등급 밝아질 때마다 7px 커짐)
+      const magToSize = mag => Math.max(4, 30 - (mag - absoluteMag) * 7);
 
+      const sizeScale = magToSize(apparentMag);
       const apparentSphere = document.getElementById("apparent-star-sphere");
       apparentSphere.style.width = sizeScale + "px";
       apparentSphere.style.height = sizeScale + "px";
       apparentSphere.style.boxShadow = `0 0 ${sizeScale / 1.5}px #fffbf0`;
 
+      const absSize = magToSize(absoluteMag);
       const absSphere = document.getElementById("absolute-star-sphere");
-      absSphere.style.width = "30px";
-      absSphere.style.height = "30px";
-      absSphere.style.boxShadow = "0 0 15px #fffbf0";
+      absSphere.style.width = absSize + "px";
+      absSphere.style.height = absSize + "px";
+      absSphere.style.boxShadow = `0 0 ${absSize / 1.5}px #fffbf0`;
 
       const relText = document.getElementById("mag-relation-text");
       const formText = document.getElementById("mag-formula-text");
