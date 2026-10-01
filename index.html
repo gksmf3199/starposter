@@ -416,7 +416,6 @@
       background: #ffcc00;
       box-shadow: 0 0 10px #ffcc00;
       z-index: 10;
-      transition: left 0.05s linear;
     }
 
     /* 6개월 후 관측 위치의 별 (두 번째 겉보기 위치) */
@@ -1150,7 +1149,7 @@
         <div class="lab-card">
           <h2><span>🔭</span> 연주시차 시뮬레이터</h2>
           <p class="lab-desc">
-            지구가 태양 주위를 공전(1년에 1바퀴)할 때, 6개월 간격으로 별을 관측하면 배경 별들을 기준으로 별의 위치가 달라져 보입니다. 이 변화를 <strong>연주시차 p(")</strong>라고 하며, 별까지의 거리 d(pc)와 <strong>p = 1/d</strong>의 직관적인 반비례 관계를 갖습니다. 슬라이더로 거리를 조절해 보세요!
+            지구가 태양 주위를 공전(1년에 1바퀴)할 때, 6개월 간격으로 별을 관측하면 배경 별들을 기준으로 별의 위치가 달라져 보입니다. 이렇게 6개월 간격으로 관측한 두 위치 사이의 각을 <strong>시차</strong>라고 하고, <strong>시차의 1/2인 값을 연주시차 p(")</strong>라고 합니다. 연주시차는 별까지의 거리 d(pc)와 <strong>p = 1/d</strong>의 직관적인 반비례 관계를 갖습니다. 슬라이더로 거리를 조절해 보세요!
           </p>
           <!-- 캔버스 드로잉 영역 -->
           <div class="sim-viewport">
@@ -1997,11 +1996,41 @@
       parallaxCtx.lineTo(earthOppositeX, earthOppositeY);
       parallaxCtx.stroke();
 
-      // 시차 표시
-      parallaxCtx.fillStyle = "#06b6d4"; // canvas는 CSS 변수를 해석하지 못하므로 직접 색상 지정
-      parallaxCtx.font = "11px sans-serif";
+      // 태양-별 기준선: 연주시차 p는 태양-별-지구가 이루는 각(시차 2p의 절반)
+      parallaxCtx.strokeStyle = "rgba(6, 182, 212, 0.9)";
+      parallaxCtx.lineWidth = 1.5;
+      parallaxCtx.beginPath();
+      parallaxCtx.moveTo(starX, starY);
+      parallaxCtx.lineTo(sunX, sunY);
+      parallaxCtx.moveTo(starX, starY);
+      parallaxCtx.lineTo(earthX, earthY);
+      parallaxCtx.stroke();
+
+      // 연주시차 p 각도 호 (태양 방향 ↔ 현재 지구 방향)
+      const angToSun = Math.atan2(sunY - starY, sunX - starX);
+      const angToEarth = Math.atan2(earthY - starY, earthX - starX);
+      const arcR = 20;
+      parallaxCtx.beginPath();
+      parallaxCtx.arc(starX, starY, arcR, angToSun, angToEarth, angToEarth < angToSun);
+      parallaxCtx.stroke();
+
+      // 시차·연주시차 표시
       const pAngle = (1 / distPc).toFixed(3);
-      parallaxCtx.fillText(`연주시차 p = ${pAngle}"`, starX - 35, starY + 20);
+      const fullAngle = (2 / distPc).toFixed(3);
+      parallaxCtx.font = "bold 10px sans-serif";
+      parallaxCtx.fillStyle = "#06b6d4"; // canvas는 CSS 변수를 해석하지 못하므로 직접 색상 지정
+      const midAng = (angToSun + angToEarth) / 2;
+      parallaxCtx.fillText("p", starX + Math.cos(midAng) * (arcR + 9) - 3, starY + Math.sin(midAng) * (arcR + 9) + 4);
+
+      parallaxCtx.font = "11px sans-serif";
+      parallaxCtx.textAlign = "right";
+      parallaxCtx.fillStyle = "rgba(255, 255, 255, 0.75)";
+      // 별이 위쪽 하늘 뷰에 가려질 만큼 멀 때는 글자를 하늘 뷰 아래로 내림
+      const labelY = Math.max(starY - 3, 95);
+      parallaxCtx.fillText(`시차 2p = ${fullAngle}"`, starX - 14, labelY);
+      parallaxCtx.fillStyle = "#06b6d4";
+      parallaxCtx.fillText(`연주시차 p = ${pAngle}"`, starX - 14, labelY + 14);
+      parallaxCtx.textAlign = "left";
 
       // 상단 하늘 뷰: 6개월 간격 두 관측 시점의 별 위치를 모두 동기화
       const skyStar = document.getElementById("parallax-sky-star");
