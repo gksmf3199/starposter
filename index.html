@@ -457,7 +457,7 @@
       height: 100%;
       display: flex;
       flex-direction: column;
-      padding: 15px;
+      padding: 8px 15px;
       justify-content: space-between;
     }
 
@@ -477,15 +477,15 @@
     }
 
     .mag-star-circle-wrap {
-      width: 120px;
-      height: 120px;
+      width: 100px;
+      height: 100px;
       display: flex;
       align-items: center;
       justify-content: center;
       background: rgba(255, 255, 255, 0.02);
       border-radius: 50%;
       border: 1px dashed rgba(255, 255, 255, 0.1);
-      margin-bottom: 10px;
+      margin-bottom: 6px;
     }
 
     .mag-star-circle {
@@ -512,9 +512,18 @@
     .mag-compare-formula {
       font-family: monospace;
       color: var(--color-accent);
-      font-size: 1rem;
+      font-size: 0.9rem;
       font-weight: bold;
       margin-top: 4px;
+    }
+
+    /* 좁은 화면: 등급 시뮬레이터 설명이 잘리지 않도록 */
+    @media (max-width: 1000px) {
+      #mag-star-note { height: auto !important; min-height: 66px; overflow: visible !important; }
+    }
+    @media (max-width: 500px) {
+      .lab-card:has(#mag-star-note) { height: auto; min-height: 680px; }
+      .lab-card:has(#mag-star-note) .sim-viewport { flex: none; min-height: 300px; }
     }
 
     /* 시뮬레이터 세부: 3) 온도와 색깔 */
@@ -1199,7 +1208,7 @@
         <div class="lab-card">
           <h2><span>💡</span> 별의 등급 시뮬레이터</h2>
           <p class="lab-desc">
-            <strong>겉보기 등급(m)</strong>은 우리 눈에 보이는 밝기이고, <strong>절대 등급(M)</strong>은 모든 별을 10pc(파섹, 약 32.6광년) 거리에 일렬로 놓았다고 가정한 실제 밝기입니다. 별의 거리를 조절하며 밝기 차이를 비교해 봅시다.
+            <strong>겉보기 등급(m)</strong>은 우리 눈에 보이는 밝기이고, <strong>절대 등급(M)</strong>은 모든 별을 10pc(파섹, 약 32.6광년) 거리에 일렬로 놓았다고 가정한 실제 밝기입니다.
           </p>
           <!-- 관측 뷰포트 -->
           <div class="sim-viewport" style="background:#02020a;">
@@ -1210,7 +1219,7 @@
                   <div class="mag-star-circle-wrap">
                     <div class="mag-star-circle" id="apparent-star-sphere" style="width:40px; height:40px; background:#fffbf0; box-shadow: 0 0 25px #fffbf0;"></div>
                   </div>
-                  <span style="font-size:0.75rem; color:var(--text-muted);">지구에서 본 모습</span>
+                  <span id="mag-apparent-caption" style="font-size:0.75rem; color:var(--text-muted);">지구에서 본 모습</span>
                   <strong style="font-size:0.95rem; margin-top:2px;">겉보기 등급 (m)</strong>
                   <span class="val" id="apparent-mag-val" style="color:var(--color-secondary); font-size:1.1rem; font-weight:700;">1.5 등급</span>
                 </div>
@@ -1219,7 +1228,7 @@
                   <div class="mag-star-circle-wrap" style="border-color: rgba(99, 102, 241, 0.4);">
                     <div class="mag-star-circle" id="absolute-star-sphere" style="width:30px; height:30px; background:#fffbf0; box-shadow: 0 0 15px #fffbf0;"></div>
                   </div>
-                  <span style="font-size:0.75rem; color:var(--text-muted);">10pc 거리 기준</span>
+                  <span id="mag-absolute-caption" style="font-size:0.75rem; color:var(--text-muted);">10pc 거리 기준</span>
                   <strong style="font-size:0.95rem; margin-top:2px;">절대 등급 (M)</strong>
                   <span class="val" id="absolute-mag-val" style="color:var(--color-primary); font-size:1.1rem; font-weight:700;">2.0 등급</span>
                 </div>
@@ -1233,21 +1242,28 @@
           </div>
           <!-- 조작 판넬 -->
           <div class="sim-controls">
-            <div class="control-group">
+            <div class="control-group" style="margin-bottom:8px;">
+              <select id="mag-star-select" aria-label="비교할 별 선택" style="width:100%; padding:6px 10px;"></select>
+            </div>
+            <div class="control-group" id="mag-custom-group" style="display:none; margin-bottom:8px;">
+              <div class="control-label">
+                <span>가상의 별 절대 등급 (M)</span>
+                <span class="val" id="mag-custom-val">2.0 등급</span>
+              </div>
+              <input type="range" id="mag-custom-slider" min="-8" max="8" step="0.5" value="2">
+            </div>
+            <div class="control-group" style="margin-bottom:8px;">
               <div class="control-label">
                 <span>별의 관측 거리 (pc)</span>
-                <span class="val" id="mag-distance-val">5.0 pc</span>
+                <span class="val" id="mag-distance-val">2.64 pc</span>
               </div>
-              <input type="range" id="mag-distance-slider" min="1" max="50" step="0.5" value="5">
+              <input type="range" id="mag-distance-slider" min="-0.3" max="3" step="0.01" value="0.42">
             </div>
-            <div class="control-group" style="display:flex; gap:10px;">
+            <div class="control-group" id="mag-btn-row" style="display:flex; gap:10px; margin-bottom:8px;">
+              <button class="btn btn-secondary" id="mag-real-btn" style="flex:1; padding:8px 0;" onclick="setMagToRealDistance()">🔭 실제 위치에서 보기</button>
               <button class="btn btn-secondary" style="flex:1; padding:8px 0;" onclick="setMagDistance(10)">📍 10pc에 일렬 배치</button>
-              <button class="btn btn-secondary" style="flex:1; padding:8px 0;" onclick="setMagDistance(2)">🏃 지구 근처로 (2pc)</button>
-              <button class="btn btn-secondary" style="flex:1; padding:8px 0;" onclick="setMagDistance(40)">🛸 멀리 우주로 (40pc)</button>
             </div>
-            <p style="font-size: 0.75rem; color: var(--text-muted); line-height:1.4; margin-top:5px; text-align:center;">
-              💡 10pc보다 가까이 오면 <strong>겉보기등급(m) &lt; 절대등급(M)</strong>이 되고, 10pc에 있으면 <strong>m = M</strong>, 10pc보다 멀어지면 <strong>m &gt; M</strong>(더 어둡게 보임)이 됩니다.
-            </p>
+            <p id="mag-star-note" style="font-size: 0.75rem; color: var(--text-muted); line-height:1.45; margin:0; padding:7px 10px; height:66px; overflow:hidden; box-sizing:border-box; background:rgba(255,255,255,0.04); border-radius:8px;"></p>
           </div>
         </div>
 
@@ -2049,59 +2065,184 @@
       requestAnimationFrame(animateParallax);
     }
 
+    /* 별의 등급 시뮬레이터
+       - 실제 별(별 탐색기 자료)을 골라 실제 위치와 10pc 위치의 밝기를 비교
+       - 절대 등급(M)은 별마다 고정, 거리를 바꾸면 겉보기 등급(m)만 변함
+       - 거리 슬라이더는 0.5pc ~ 1000pc 로그 눈금 */
+    let magSelectedStar = null;   // null 이면 가상의 별
+    let magCustomAbs = 2.0;
+    let magDistance = 10;
+    let magAtRealPosition = false;
+
+    function magRealDistance(star) {
+      return star ? parseFloat(star.distancePc) : null;
+    }
+
+    function magFormatDistance(d) {
+      if (d < 0.001) return d.toPrecision(2) + " pc";
+      if (d < 10) return d.toFixed(2) + " pc";
+      if (d < 100) return d.toFixed(1) + " pc";
+      return Math.round(d) + " pc";
+    }
+
+    function magFormatMag(v) {
+      const r = Math.round(v * 100) / 100;
+      return (Object.is(r, -0) ? 0 : r).toFixed(2);
+    }
+
     function initMagnitudeSimulator() {
-      const distSlider = document.getElementById("mag-distance-slider");
-      distSlider.addEventListener("input", function() {
-        updateMagnitudeView(parseFloat(this.value));
+      const select = document.getElementById("mag-star-select");
+      const sampleIds = ["sun", "polaris"];
+      const ordered = [
+        ...sampleIds.map(id => starsDatabase.find(s => s.id === id)).filter(Boolean),
+        ...starsDatabase.filter(s => !sampleIds.includes(s.id))
+      ];
+      ordered.forEach(star => {
+        const opt = document.createElement("option");
+        opt.value = star.id;
+        opt.textContent = `🌟 ${star.name}  (절대 등급 M = ${star.absoluteMag})`;
+        select.appendChild(opt);
       });
-      updateMagnitudeView(5.0);
+      const customOpt = document.createElement("option");
+      customOpt.value = "custom";
+      customOpt.textContent = "✏️ 가상의 별 (절대 등급 직접 정하기)";
+      select.appendChild(customOpt);
+
+      select.addEventListener("change", function() {
+        selectMagStar(this.value);
+      });
+
+      document.getElementById("mag-distance-slider").addEventListener("input", function() {
+        magDistance = Math.pow(10, parseFloat(this.value));
+        magAtRealPosition = false;
+        updateMagnitudeView(magDistance);
+      });
+
+      document.getElementById("mag-custom-slider").addEventListener("input", function() {
+        magCustomAbs = parseFloat(this.value);
+        updateMagnitudeView(magDistance);
+      });
+
+      select.value = "sirius";
+      selectMagStar("sirius");
+    }
+
+    function selectMagStar(id) {
+      const customGroup = document.getElementById("mag-custom-group");
+      if (id === "custom") {
+        magSelectedStar = null;
+        customGroup.style.display = "block";
+        document.getElementById("mag-btn-row").style.display = "none";
+        setMagDistance(5);
+      } else {
+        magSelectedStar = starsDatabase.find(s => s.id === id) || null;
+        customGroup.style.display = "none";
+        document.getElementById("mag-btn-row").style.display = "flex";
+        setMagToRealDistance();
+      }
+    }
+
+    function setMagToRealDistance() {
+      if (!magSelectedStar) return;
+      magDistance = magRealDistance(magSelectedStar);
+      magAtRealPosition = true;
+      const slider = document.getElementById("mag-distance-slider");
+      slider.value = Math.max(parseFloat(slider.min), Math.log10(magDistance));
+      updateMagnitudeView(magDistance);
     }
 
     function setMagDistance(val) {
+      magDistance = val;
+      magAtRealPosition = !!magSelectedStar && Math.abs(magRealDistance(magSelectedStar) - val) < 1e-9;
       const slider = document.getElementById("mag-distance-slider");
-      slider.value = val;
+      slider.value = Math.log10(val);
       updateMagnitudeView(val);
     }
 
     function updateMagnitudeView(distancePc) {
-      document.getElementById("mag-distance-val").innerText = `${distancePc.toFixed(1)} pc`;
-      const absoluteMag = 2.0;
-      const apparentMag = absoluteMag + 5 * Math.log10(distancePc) - 5;
+      const star = magSelectedStar;
+      const absoluteMag = star ? star.absoluteMag : magCustomAbs;
+      const calcApparent = absoluteMag + 5 * Math.log10(distancePc) - 5;
+      // 실제 위치에서는 별 탐색기와 같은 관측값(m)을 그대로 보여줌
+      const apparentMag = (star && magAtRealPosition) ? star.apparentMag : calcApparent;
+      const starColor = star ? star.colorHex : "#fffbf0";
 
-      document.getElementById("apparent-mag-val").innerText = apparentMag.toFixed(2) + " 등급";
-      document.getElementById("absolute-mag-val").innerText = absoluteMag.toFixed(1) + " 등급";
+      // 거리 표시
+      const distLabel = (star && star.id === "sun" && magAtRealPosition)
+        ? "0.0000048 pc (약 8광분)"
+        : magFormatDistance(distancePc);
+      document.getElementById("mag-distance-val").innerText = distLabel;
+      document.getElementById("mag-apparent-caption").innerText =
+        magAtRealPosition ? "지구에서 본 모습 (실제 위치)" : `지구에서 본 모습 (${distLabel})`;
 
-      // 같은 등급이면 같은 크기가 되도록 겉보기·절대 등급 모두 하나의 기준으로 크기 계산
-      // (절대 등급 2.0등급 = 30px 기준, 1등급 밝아질 때마다 7px 커짐)
-      const magToSize = mag => Math.max(4, 30 - (mag - absoluteMag) * 7);
+      // 표시용 숫자: 실제 별은 별 탐색기·포스터와 똑같은 값(반올림 없이)을 사용
+      const at10pc = Math.abs(distancePc - 10) < 0.05;
+      const absText = star ? String(star.absoluteMag) : magCustomAbs.toFixed(1);
+      let appText;
+      if (star && magAtRealPosition) appText = String(star.apparentMag);
+      else if (at10pc) appText = absText;
+      else appText = magFormatMag(calcApparent);
+
+      document.getElementById("apparent-mag-val").innerText = appText + " 등급";
+      document.getElementById("absolute-mag-val").innerText = absText + " 등급";
+      document.getElementById("mag-custom-val").innerText = magCustomAbs.toFixed(1) + " 등급";
+
+      // 같은 등급이면 같은 크기 (2등급 = 30px, 1등급 밝아질 때마다 5px 커짐)
+      const magToSize = mag => Math.min(90, Math.max(4, 30 - (mag - 2) * 5));
 
       const sizeScale = magToSize(apparentMag);
       const apparentSphere = document.getElementById("apparent-star-sphere");
       apparentSphere.style.width = sizeScale + "px";
       apparentSphere.style.height = sizeScale + "px";
-      apparentSphere.style.boxShadow = `0 0 ${sizeScale / 1.5}px #fffbf0`;
+      apparentSphere.style.background = starColor;
+      apparentSphere.style.boxShadow = `0 0 ${sizeScale / 1.5}px ${starColor}`;
 
       const absSize = magToSize(absoluteMag);
       const absSphere = document.getElementById("absolute-star-sphere");
       absSphere.style.width = absSize + "px";
       absSphere.style.height = absSize + "px";
-      absSphere.style.boxShadow = `0 0 ${absSize / 1.5}px #fffbf0`;
+      absSphere.style.background = starColor;
+      absSphere.style.boxShadow = `0 0 ${absSize / 1.5}px ${starColor}`;
 
       const relText = document.getElementById("mag-relation-text");
       const formText = document.getElementById("mag-formula-text");
 
-      if (distancePc < 10) {
-        relText.innerText = "별의 거리 < 10pc (겉보기가 실제보다 더 밝게 보임)";
-        relText.style.color = "var(--color-secondary)";
-        formText.innerText = `겉보기 등급(${apparentMag.toFixed(1)}) < 절대 등급(${absoluteMag.toFixed(1)})`;
-      } else if (Math.abs(distancePc - 10) < 0.1) {
+      if (at10pc) {
         relText.innerText = "별의 거리 = 10pc (겉보기 밝기와 절대 밝기가 같음)";
         relText.style.color = "#fff";
-        formText.innerText = `겉보기 등급(${apparentMag.toFixed(1)}) = 절대 등급(${absoluteMag.toFixed(1)})`;
+        formText.innerText = `겉보기 등급(${appText}) = 절대 등급(${absText})`;
+      } else if (distancePc < 10) {
+        relText.innerText = "별의 거리 < 10pc (겉보기가 실제보다 더 밝게 보임)";
+        relText.style.color = "var(--color-secondary)";
+        formText.innerText = `겉보기 등급(${appText}) < 절대 등급(${absText})`;
       } else {
         relText.innerText = "별의 거리 > 10pc (실제 밝기보다 어둡게 보임)";
         relText.style.color = "var(--color-primary)";
-        formText.innerText = `겉보기 등급(${apparentMag.toFixed(1)}) > 절대 등급(${absoluteMag.toFixed(1)})`;
+        formText.innerText = `겉보기 등급(${appText}) > 절대 등급(${absText})`;
+      }
+
+      // 상황 설명
+      const note = document.getElementById("mag-star-note");
+      if (!star) {
+        note.innerHTML = `✏️ <strong>가상의 별</strong>: 절대 등급(별 자체의 밝기)을 정한 뒤 거리를 바꿔 보세요. 거리가 바뀌면 겉보기 등급만 변해요.`;
+      } else {
+        const realD = magRealDistance(star);
+        const realLabel = star.id === "sun" ? "0.0000048pc(약 8광분)" : `${star.distancePc}pc`;
+        if (magAtRealPosition) {
+          let extra = "";
+          if (Math.abs(calcApparent - star.apparentMag) >= 0.15) {
+            extra = ` <span style="color:var(--text-muted);">(공식 계산값 ${magFormatMag(calcApparent)}과의 차이는 우주 먼지의 빛 흡수와 밝기 변화 때문)</span>`;
+          }
+          const nearFar = realD < 10
+            ? "10pc보다 가까워서 실제보다 <strong>더 밝게</strong> 보여요(m &lt; M). '10pc에 일렬 배치'를 눌러 보세요."
+            : "10pc보다 멀어서 실제보다 <strong>더 어둡게</strong> 보여요(m &gt; M). '10pc에 일렬 배치'를 눌러 보세요.";
+          note.innerHTML = `🔭 실제 거리 <strong>${realLabel}</strong>: ${nearFar}${extra}`;
+        } else if (Math.abs(distancePc - 10) < 0.05) {
+          note.innerHTML = `📍 10pc로 옮기면 겉보기 등급 = <strong>절대 등급(M = ${star.absoluteMag})</strong>. 💡 시리우스와 리겔을 10pc에서 비교해 보세요. 지구에선 시리우스가 더 밝지만 실제로는 리겔이 훨씬 밝아요!`;
+        } else {
+          const dir = distancePc < realD ? "가까이" : "멀리";
+          note.innerHTML = `🚀 실제 거리(${realLabel})보다 <strong>${dir}</strong> 옮겼어요. <strong>겉보기 등급(m)</strong>은 변하지만 <strong>절대 등급(M = ${star.absoluteMag})</strong>은 그대로예요.`;
+        }
       }
     }
 
